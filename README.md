@@ -5,7 +5,8 @@ let it answer visitors with grounded, streamed replies while capturing leads.
 
 - **Backend:** FastAPI · SQLAlchemy 2.0 (async) · Postgres + pgvector · LangGraph · OpenAI-compatible models
 - **Frontend:** Next.js dashboard + embeddable widget
-- **Live:** https://rag.umairamir.com (API docs at `/docs`)
+- **Live:** coming soon at https://rag.umairamir.com (API docs at `/docs`)
+- **Project docs:** [`docs/`](docs/) — architecture, API contract, decisions, roadmap ([start here](docs/HANDOFF.md))
 
 ## How it works
 
