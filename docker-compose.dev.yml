@@ -1,0 +1,26 @@
+# Local development: only Postgres + pgvector. Run the API (uv) and the
+# frontend (pnpm dev) on the host.
+#   docker compose -f docker-compose.dev.yml up -d
+#   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ragpilot
+name: ragpilot-dev
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ragpilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ragpilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  pgdata-dev:

@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+.env
+.env.*
+!.env.example
+Dockerfile
+.dockerignore
+.git
+.vscode
+e2e
+e2e-ui
+playwright-report
+test-results
+blob-report
+playwright/.cache
+*.log

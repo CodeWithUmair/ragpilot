@@ -1,0 +1,62 @@
+# DigitalOcean App Platform spec for the RagPilot API (FastAPI, built from
+# backend/Dockerfile). Gives an HTTPS URL like https://ragpilot-api-xxxxx.ondigitalocean.app
+# before any custom domain exists.
+#
+#   doctl apps create --spec .do/app.yaml        (or: Apps → Create → import this spec)
+#
+# Then set the SECRET values in the dashboard (App → Settings → api → Environment
+# Variables → Encrypt). After the first deploy, put the real URLs into API_URL /
+# APP_URL and redeploy.
+
+name: ragpilot-api
+region: fra  # pick the region closest to your Neon database
+
+services:
+  - name: api
+    # Public repo: App Platform can clone it without GitHub access. Switch to a
+    # `github:` block (repo + branch + deploy_on_push: true) for auto-deploys
+    # once the DigitalOcean GitHub app is installed on the repo.
+    git:
+      repo_clone_url: https://github.com/CodeWithUmair/ragpilot.git
+      branch: main
+    source_dir: /backend
+    dockerfile_path: backend/Dockerfile
+    http_port: 4000
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    instance_count: 1
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 15
+    envs:
+      - key: APP_ENV
+        value: production
+      - key: PORT
+        value: "4000"
+      - key: REQUIRE_EMAIL_VERIFICATION
+        value: "false"
+      - key: OPENAI_CHAT_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_EMBED_MODEL
+        value: text-embedding-3-small
+      - key: OPENAI_EMBED_DIMENSIONS
+        value: "1024"
+      - key: EMAIL_FROM_NAME
+        value: RagPilot
+      # ⚠️ Replace after the first deploy / once the Vercel URL exists:
+      - key: API_URL
+        value: https://REPLACE-with-this-app.ondigitalocean.app
+      - key: APP_URL
+        value: https://REPLACE-with-your-frontend.vercel.app
+      # Secrets — set real values in the dashboard, encrypted:
+      - key: DATABASE_URL
+        type: SECRET
+        value: REPLACE  # Neon DIRECT connection string (host WITHOUT "-pooler")
+      - key: AUTH_SECRET
+        type: SECRET
+        value: REPLACE  # python -c "import secrets;print(secrets.token_urlsafe(48))"
+      - key: OPENAI_API_KEY
+        type: SECRET
+        value: REPLACE
+      - key: ADMIN_EMAILS
+        value: ""

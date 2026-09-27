@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Embed test page</title>
+    <style>
+      body { font: 16px/1.55 system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #111; }
+      h1 { font-size: 22px; margin-bottom: 4px; }
+      p.muted { color: #555; }
+      code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: 90%; }
+      .box { border: 1px solid #e5e7eb; padding: 16px 18px; border-radius: 10px; background: #fafafa; margin-top: 20px; }
+      label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+      input { width: 100%; padding: 8px 10px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 6px; font-family: ui-monospace, monospace; }
+      button { margin-top: 10px; padding: 8px 14px; font-size: 14px; border: 0; border-radius: 6px; background: #6B46C1; color: white; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>Customer site (simulated)</h1>
+    <p class="muted">
+      This page pretends to be a third-party customer website (e.g.
+      <code>example.com</code>) that has pasted the chatbot embed snippet.
+      The bubble should appear in the bottom-right corner.
+    </p>
+
+    <div class="box">
+      <label for="token">Embed token</label>
+      <input id="token" placeholder="paste from dashboard Embed tab" />
+      <button id="load">Load widget</button>
+      <p class="muted" style="font-size: 13px; margin-top: 12px;">
+        After pasting the token and clicking Load, the snippet below is
+        injected. Reload the page to clear.
+      </p>
+    </div>
+
+    <h2 style="margin-top: 32px; font-size: 16px;">Snippet that will be injected</h2>
+    <pre id="snippet" style="background:#f3f4f6;padding:12px;border-radius:8px;font-size:12px;overflow:auto;">&lt;script src="/chatbot-embed.js" data-token="YOUR_TOKEN" defer&gt;&lt;/script&gt;</pre>
+
+    <script>
+      var saved = localStorage.getItem('chatbot-test-token');
+      if (saved) document.getElementById('token').value = saved;
+
+      document.getElementById('load').addEventListener('click', function () {
+        var token = document.getElementById('token').value.trim();
+        if (!token) { alert('Paste a token first'); return; }
+        localStorage.setItem('chatbot-test-token', token);
+
+        if (document.querySelector('script[src*="chatbot-embed.js"]')) {
+          alert('Widget already loaded. Reload the page to re-init.');
+          return;
+        }
+        var s = document.createElement('script');
+        s.src = '/chatbot-embed.js';
+        s.setAttribute('data-token', token);
+        s.defer = true;
+        document.body.appendChild(s);
+
+        document.getElementById('snippet').textContent =
+          '<script src="/chatbot-embed.js" data-token="' + token + '" defer><\/script>';
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+# Production stack for a single VPS. nginx on the host terminates TLS and
+# proxies to the loopback-only ports below (see deploy/).
+name: ragpilot
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ragpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ragpilot}
+      POSTGRES_DB: ${POSTGRES_DB:-ragpilot}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: ./backend
+      args:
+        GIT_SHA: ${GIT_SHA:-}
+    restart: unless-stopped
+    env_file: backend/.env
+    environment:
+      # Overrides any DATABASE_URL in backend/.env so the API always talks to the db service.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ragpilot}:${POSTGRES_PASSWORD:-ragpilot}@db:5432/${POSTGRES_DB:-ragpilot}
+      APP_ENV: production
+      PORT: "4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:4000:4000"
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://rag.umairamir.com}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://rag.umairamir.com}
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:3000:3000"
+
+volumes:
+  pgdata:

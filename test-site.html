@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Acme Inc — fake customer site</title>
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --fg: #e8eaf0;
+        --muted: #8b93a7;
+        --card: #11141b;
+        --border: #1f2330;
+        --accent: #6B46C1;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 15px/1.6 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+      }
+      header {
+        padding: 18px 32px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .logo .dot {
+        width: 24px; height: 24px;
+        background: linear-gradient(135deg, var(--accent), #ec4899);
+        border-radius: 6px;
+      }
+      nav a {
+        color: var(--muted);
+        text-decoration: none;
+        margin-left: 24px;
+        font-size: 14px;
+      }
+      main {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 64px 32px 120px;
+      }
+      h1 {
+        font-size: 44px;
+        line-height: 1.1;
+        margin: 0 0 16px;
+        letter-spacing: -0.02em;
+      }
+      h1 span {
+        background: linear-gradient(90deg, #c4b5fd, #f0abfc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: 18px;
+        max-width: 580px;
+        margin-bottom: 40px;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: white;
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 64px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .card h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+      }
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .hint {
+        margin-top: 80px;
+        padding: 18px 20px;
+        background: rgba(107, 70, 193, 0.1);
+        border: 1px solid rgba(107, 70, 193, 0.3);
+        border-radius: 10px;
+        font-size: 13px;
+        color: #c4b5fd;
+      }
+      .hint code {
+        background: rgba(255,255,255,0.08);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      footer {
+        margin-top: 80px;
+        padding: 24px 32px;
+        border-top: 1px solid var(--border);
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <div class="dot"></div>
+        <span>Acme Inc</span>
+      </div>
+      <nav>
+        <a href="#">Product</a>
+        <a href="#">Pricing</a>
+        <a href="#">Docs</a>
+        <a href="#">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Software that <span>just works</span>.</h1>
+      <p class="lede">
+        We build Web3 and AI solutions for ambitious teams. From smart-contract
+        audits to LLM-powered chatbots — we ship the boring parts so you can
+        focus on the product.
+      </p>
+      <a href="#" class="cta">Start a project →</a>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Web3</h3>
+          <p>Smart contracts, audits, dApps.</p>
+        </div>
+        <div class="card">
+          <h3>Generative AI</h3>
+          <p>RAG pipelines, chatbots, embeddings.</p>
+        </div>
+        <div class="card">
+          <h3>Dedicated teams</h3>
+          <p>Senior engineers, embedded for months.</p>
+        </div>
+        <div class="card">
+          <h3>Custom dev</h3>
+          <p>Full-stack TypeScript, end to end.</p>
+        </div>
+      </div>
+
+      <div class="hint">
+        <strong>👋 Embed test:</strong> The chatbot bubble should appear in the
+        bottom-right corner. Click it to chat. If you don&rsquo;t see it,
+        check the browser console for errors and make sure
+        <code>localhost:3000</code> (frontend) and <code>localhost:4000</code>
+        (backend) are both running.
+      </div>
+    </main>
+
+    <footer>
+      © 2026 Acme Inc · This is a fake site for testing the chatbot embed.
+    </footer>
+
+    <!-- ─────────── Chatbot embed snippet ─────────── -->
+    <!-- This is the same one-liner a real customer would paste. -->
+    <script
+      src="http://localhost:3000/chatbot-embed.js"
+      data-token="0c2a12123ed49a360c1c204bdafd9270"
+      defer
+    ></script>
+  </body>
+</html>
