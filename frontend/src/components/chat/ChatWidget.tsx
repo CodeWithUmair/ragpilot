@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeHighlight from 'rehype-highlight';
 import {
-  ArrowUp, ChevronLeft, ChevronRight, Home, MessageSquare, MessagesSquare,
+  ArrowUp, ChevronLeft, ChevronRight, ExternalLink, Home, MessageSquare, MessagesSquare,
   Send, Square, X,
 } from 'lucide-react';
 import { config } from '../../lib/config';
@@ -18,10 +18,18 @@ interface ChatWidgetProps {
   hostPageUrl?: string;
 }
 
+interface SourceItem {
+  url: string;
+  title: string;
+  type: string;
+  score: number;
+}
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  sources?: SourceItem[];
 }
 
 interface ChatTurn {
@@ -238,6 +246,17 @@ export default function ChatWidget({ token, url, hostPageUrl }: ChatWidgetProps)
     });
   }
 
+  function setSourcesOnLast(sources: SourceItem[]) {
+    setMessages((prev) => {
+      const msgs = [...prev];
+      const last = msgs[msgs.length - 1];
+      if (last?.role === 'assistant' && sources.length) {
+        msgs[msgs.length - 1] = { ...last, sources };
+      }
+      return msgs;
+    });
+  }
+
   function handleLeadEvent(payload: Partial<LeadForm>) {
     if (leadDoneRef.current) return;
     if (botInfo?.leadConfig && botInfo.leadConfig.enabled === false) return;
@@ -287,8 +306,8 @@ export default function ChatWidget({ token, url, hostPageUrl }: ChatWidgetProps)
     }
   }
 
-  async function sendMessage() {
-    const q = input.trim();
+  async function sendMessage(override?: string) {
+    const q = (override ?? input).trim();
     if (!q || loading) return;
     setInput('');
 
@@ -335,6 +354,7 @@ export default function ChatWidget({ token, url, hostPageUrl }: ChatWidgetProps)
             try {
               const payload = JSON.parse(line.slice(6));
               if (currentEvent === 'lead') handleLeadEvent(payload);
+              else if (currentEvent === 'sources') setSourcesOnLast(payload.sources ?? []);
               else if (payload.content) { fullAnswer += payload.content; appendToLast(payload.content); }
             } catch {}
           }
@@ -591,7 +611,7 @@ function ChatView(props: {
   loading: boolean;
   input: string;
   setInput: (v: string) => void;
-  onSend: () => void;
+  onSend: (override?: string) => void;
   onStop: () => void;
   onBack: () => void;
   onClose: () => void;
@@ -633,15 +653,30 @@ function ChatView(props: {
           </Bubble>
         )}
 
-        {messages.map((msg) => (
-          <Bubble key={msg.id} role={msg.role} themeColor={themeColor}>
-            {msg.role === 'assistant'
-              ? (msg.content
-                ? <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeHighlight]}>{msg.content}</ReactMarkdown>
-                : <TypingDots />)
-              : msg.content}
-          </Bubble>
-        ))}
+        {messages.map((msg, i) => {
+          // Sources arrive before the answer finishes streaming (SSE order:
+          // sources -> delta* -> done) — hold the cards/chips back until this
+          // specific message is done, not just any message, so they don't pop
+          // in above a still-typing answer.
+          const settled = !loading || i !== messages.length - 1;
+          return (
+            <div key={msg.id}>
+              <Bubble role={msg.role} themeColor={themeColor}>
+                {msg.role === 'assistant'
+                  ? (msg.content
+                    ? <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} rehypePlugins={[rehypeHighlight]}>{msg.content}</ReactMarkdown>
+                    : <TypingDots />)
+                  : msg.content}
+              </Bubble>
+              {msg.role === 'assistant' && settled && !!msg.sources?.length && (
+                <>
+                  <SourceCards sources={msg.sources} themeColor={themeColor} />
+                  <QuickReplies sources={msg.sources} themeColor={themeColor} onPick={(q) => onSend(q)} />
+                </>
+              )}
+            </div>
+          );
+        })}
 
         {leadForm && (
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -682,7 +717,7 @@ function ChatView(props: {
             style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, lineHeight: '20px', padding: '8px 0', color: '#111827', resize: 'none', fontFamily: 'inherit' }}
           />
           <button
-            onClick={loading ? onStop : onSend}
+            onClick={loading ? onStop : () => onSend()}
             style={{ width: 36, height: 36, borderRadius: '50%', background: loading ? '#e5e7eb' : themeColor, border: 'none', cursor: input.trim() || loading ? 'pointer' : 'not-allowed', opacity: input.trim() || loading ? 1 : 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginBottom: 1 }}
             aria-label={loading ? 'Stop' : 'Send'}
           >
@@ -739,6 +774,73 @@ function Bubble({ role, themeColor, children }: { role: 'user' | 'assistant'; th
       }}>
         {children}
       </div>
+    </div>
+  );
+}
+
+// Reuses the SAME `sources` payload every answer already carries (Phase 3b
+// added the checkout-link guardrail on the backend side of this data; this
+// is the frontend finally rendering it — no new backend event, no new LLM
+// call). Cards link out to the cited page; chips ask a natural follow-up
+// about it, since retrieval doesn't produce a separate "suggested question."
+function SourceCards({ sources, themeColor }: { sources: SourceItem[]; themeColor: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6, marginLeft: 2 }}>
+      {sources.slice(0, 3).map((s) => (
+        <a
+          key={s.url}
+          href={s.url}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8, maxWidth: '82%',
+            padding: '8px 12px', borderRadius: 12, background: '#fff',
+            border: '1px solid #eef0f3', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            textDecoration: 'none', color: '#111827',
+          }}
+        >
+          <span style={{
+            flexShrink: 0, width: 22, height: 22, borderRadius: 6, background: `${themeColor}14`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <ExternalLink size={12} color={themeColor} />
+          </span>
+          <span style={{ fontSize: 12.5, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {s.title || s.url}
+          </span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function QuickReplies({
+  sources,
+  themeColor,
+  onPick,
+}: {
+  sources: SourceItem[];
+  themeColor: string;
+  onPick: (question: string) => void;
+}) {
+  // Top 2 distinct titles only — more than that reads as clutter, not help.
+  const chips = Array.from(new Set(sources.map((s) => s.title).filter(Boolean))).slice(0, 2);
+  if (!chips.length) return null;
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8, marginLeft: 2 }}>
+      {chips.map((title) => (
+        <button
+          key={title}
+          onClick={() => onPick(`Tell me more about ${title}`)}
+          style={{
+            fontSize: 12.5, fontWeight: 500, padding: '6px 12px', borderRadius: 999,
+            background: '#fff', border: `1px solid ${themeColor}40`, color: themeColor,
+            cursor: 'pointer', whiteSpace: 'nowrap',
+          }}
+        >
+          Tell me more about {title}
+        </button>
+      ))}
     </div>
   );
 }

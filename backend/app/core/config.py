@@ -8,7 +8,7 @@ the same job zod did in the Express version.
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -47,6 +47,17 @@ class Settings(BaseSettings):
     openai_api_key: str
     openai_base_url: str | None = None
     openai_embed_model: str = "text-embedding-3-small"
+
+    @field_validator("openai_base_url", mode="before")
+    @classmethod
+    def _blank_base_url_means_default(cls, v: str | None) -> str | None:
+        # AsyncOpenAI(base_url=...) only falls back to the default endpoint when
+        # base_url is None — an explicit "" (what `OPENAI_BASE_URL=` in .env
+        # resolves to) is used literally and produces a schemeless request URL.
+        # ".env.example" documents "leave empty for OpenAI", so empty must mean
+        # unset here, not "use this exact blank string".
+        return v or None
+
     # Must match the vector(1024) column. text-embedding-3-* is truncated to
     # this size via the `dimensions` request parameter.
     openai_embed_dimensions: int = 1024

@@ -8,16 +8,42 @@ line items in `ROADMAP.md`, and this file can be trimmed to a pointer.
 ## The goal
 
 Today RagPilot answers questions when asked (crawl → embed → retrieve →
-answer). The direction: make it behave more like a salesperson —
-qualify visitor intent, tier leads by how likely they are to convert, and
-(eventually) let the agent take actions rather than only produce text.
-Rationale: a grounded Q&A bot is table stakes next to competitors; an agent
-that qualifies and acts is the differentiator.
+answer). The direction: make it behave more like an agent that qualifies,
+helps, and (eventually) acts — not just a Q&A retrieval bot. Rationale: a
+grounded Q&A bot is table stakes next to competitors; an agent that
+qualifies and acts is the differentiator.
 
 This is deliberately split into three phases of very different cost and risk.
 **Do not build phase 2 before phase 1 ships, or phase 3 before phase 2** —
 each phase's recommendation below depends on the previous one being live and
 observed for a while first.
+
+## Supporting principles (2026-09-28)
+
+- **Not sales-only.** Umair clarified the agent should also work as a
+  support/help assistant, not just a salesperson — this is already mostly
+  built, not a gap: `frontend/src/app/dashboard/chatbots/new/page.tsx`
+  already ships `General AI Agent` / `Customer Support` / `Sales Agent` /
+  `Custom Prompt` persona presets per chatbot (`PERSONALITIES`), each with
+  its own system prompt. Nothing in phases 1-3 above is sales-specific at
+  the graph level — lead tiering/capture only activates when
+  `leadConfig.enabled` is on, so a pure-support chatbot can leave it off
+  entirely and just answer/help.
+- **LLM call efficiency is a standing constraint, not a one-off concern.**
+  Already the guiding principle behind D8 (heuristics over an LLM classifier
+  for intent/contact/tiering), D9 (bounded query rewrite, max 1 retry), and
+  batched embedding calls during ingestion. Applies going forward too: any
+  new phase (especially 3c tool-calling) gets judged on calls-per-turn
+  before it gets judged on capability. The LLM call-log table already on
+  `ROADMAP.md` is what turns "should be efficient" into an actual measured
+  number instead of a feeling — worth prioritizing once 3a/3b settle.
+- **The widget UI should feel genuinely interactive, not just a text
+  stream.** Today: streamed token-by-token answers + a typing-dots animation
+  while waiting (`ChatWidget.tsx` `TypingDots`). What's NOT there yet: rich
+  in-chat components (quick-reply buttons, suggested-question chips, cards
+  for products/results, inline the-checkout-link-as-a-button rather than
+  plain text). This is an open question, not yet scoped — see the open
+  decision below.
 
 ## Current state (what already exists, so the phases below are diffs, not rewrites)
 

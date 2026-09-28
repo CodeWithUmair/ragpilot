@@ -27,7 +27,7 @@ manually by the owner: Neon (DB) → DigitalOcean App Platform (API) → Vercel
 | API hosting (DigitalOcean App Platform, client's account) | ⏳ Owner to do | Spec: `.do/app.yaml` |
 | Frontend hosting (Vercel) | ⏳ Owner to do manually | Root Directory = `frontend` |
 | DNS `rag.umairamir.com` | ⏳ Later | Then switch to the single-VPS setup in `deploy/` or just repoint URLs |
-| Real OpenAI end-to-end run | ❌ Not yet done | All LLM paths are tested with fakes only — do a live smoke test after deploy |
+| Real OpenAI end-to-end run | ✅ Done locally (2026-09-28) | Trained + chatted against a real key; caught and fixed a real bug (see Known gaps). Still worth re-running once deployed. |
 | Playwright e2e against new backend | ❌ Not yet run | Specs exist in `frontend/e2e*`; seed endpoints are ported |
 
 ## Deployment runbook (in order — each step needs the previous step's URL)
@@ -66,17 +66,16 @@ Later, with DNS: either keep Vercel + DO and point `rag.umairamir.com` at Vercel
 
 ## Known gaps / tech debt (prioritised)
 
-1. **No live LLM test yet** — run one real chat + training after deploy.
-2. **No rate limiting** on public endpoints (`/api/chat`, `/api/leads`, signup). Per-owner
+1. **No rate limiting** on public endpoints (`/api/chat`, `/api/leads`, signup). Per-owner
    message quota exists, but abuse could still burn OpenAI credit. Add per-IP limits.
-3. **"Monthly" message limit never resets** — `messageUsage` only resets via admin
+2. **"Monthly" message limit never resets** — `messageUsage` only resets via admin
    (inherited from the Express version). Needs a monthly reset job or period column.
-4. **Training runs inside the HTTP request** (SSE). Fine for ≤50 pages; a job queue
+3. **Training runs inside the HTTP request** (SSE). Fine for ≤50 pages; a job queue
    (Arq/Postgres jobs) would survive disconnects and redeploys.
-5. **Images/vision not ingested** (was disabled in the original too).
-6. CI shows GitHub "Node 20 deprecated" notices for actions — bump action versions eventually.
-7. `shadcn` is a runtime dependency in `frontend/package.json`; could move to devDependencies.
-8. Unused legacy tables `Verification`, `ShopifyStore` exist in the schema for parity.
+4. **Images/vision not ingested** (was disabled in the original too).
+5. CI shows GitHub "Node 20 deprecated" notices for actions — bump action versions eventually.
+6. `shadcn` is a runtime dependency in `frontend/package.json`; could move to devDependencies.
+7. Unused legacy tables `Verification`, `ShopifyStore` exist in the schema for parity.
 
 ## Next steps (suggested order)
 
@@ -94,3 +93,16 @@ Later, with DNS: either keep Vercel + DO and point `rag.umairamir.com` at Vercel
   with a LangGraph agent; ported auth with Better Auth compatibility; idempotent Alembic
   migration; SSRF guard; fixed tenant-isolation holes; 204 tests; Docker/nginx/CI/DO spec;
   frontend rebrand. Pushed to GitHub (`808378f`), CI green. Added this docs/ memory.
+- **2026-09-28** — Local dev environment brought up (Docker pgvector remapped to port 5433 —
+  a native `postgresql-x64-18` Windows service already owns 5432 on this machine; see
+  `docker-compose.dev.yml`). Wrote `docs/AGENT_VISION.md` (proposed sales/support agent
+  direction) and shipped phases 1, 2, 3a, 3b from it: `Lead.priority` tiering (D17),
+  owner-authored proactive opener (D18), Slack/Discord/Telegram lead forwarding, and a
+  checkout-link prompt guardrail. Phase 3c (real tool-calling) explicitly paused. Added
+  clickable source cards + quick-reply chips to the widget, reusing the `sources` SSE event
+  the backend already sent but the frontend previously discarded — no new backend surface.
+  Ran the **first real OpenAI smoke test** (train + chat against a live key) and it
+  immediately caught a real bug: `OPENAI_BASE_URL=` (present but empty) resolved to `""`,
+  and `AsyncOpenAI(base_url="")` is not the same as unset — every LLM call failed with
+  `APIConnectionError`. Fixed at the `Settings` layer (`core/config.py`) so blank means
+  `None`, not literal, with a regression test. Pushed in two commits.
