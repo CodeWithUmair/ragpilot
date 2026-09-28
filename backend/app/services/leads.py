@@ -19,7 +19,7 @@ from app.core.config import get_settings
 from app.db.models import Lead
 from app.db.session import SessionLocal
 from app.lib.contact_extract import ExtractedContact
-from app.lib.lead_config import resolve_lead_config
+from app.lib.lead_config import PRIORITY_RANK, resolve_lead_config
 from app.lib.net import safe_client
 from app.services.email import send_email
 
@@ -54,10 +54,12 @@ class LeadOwner:
 
 async def capture_chat_lead(
     db: AsyncSession, *, chatbot_id: str, namespace: str, session_id: str | None, visitor_id: str | None,
-    host_page_url: str | None, contact: ExtractedContact,
+    host_page_url: str | None, contact: ExtractedContact, priority: str = "COLD",
 ) -> tuple[Lead, bool] | None:
     """One lead per chat session: later turns enrich it instead of duplicating.
-    Returns (lead, is_new), or None when there is no handle to create one with."""
+    Returns (lead, is_new), or None when there is no handle to create one with.
+    Priority is upgrade-only (COLD < WARM < HOT) — a calmer later message must
+    not erase urgency the visitor already showed earlier in the conversation."""
     sid = clean(session_id)
     existing = (
         await db.scalar(select(Lead).where(Lead.chatbot_id == chatbot_id, Lead.session_id == sid)) if sid else None
@@ -71,11 +73,13 @@ async def capture_chat_lead(
         for key, value in fields.items():
             if value:
                 setattr(existing, key, value)
+        if PRIORITY_RANK.get(priority, 0) > PRIORITY_RANK.get(existing.priority, 0):
+            existing.priority = priority
         await db.commit()
         return existing, False
     lead = Lead(
         chatbot_id=chatbot_id, namespace=namespace, session_id=sid, visitor_id=clean(visitor_id),
-        source=clean(host_page_url), **fields,
+        source=clean(host_page_url), priority=priority, **fields,
     )
     db.add(lead)
     await db.commit()
@@ -105,11 +109,11 @@ class DbLeadStore:
     async def known_contact(self) -> ExtractedContact:
         return await session_contact(self.db, self.owner.chatbot_id, self.session_id)
 
-    async def capture(self, contact: ExtractedContact) -> None:
+    async def capture(self, contact: ExtractedContact, *, priority: str = "COLD") -> None:
         try:
             result = await capture_chat_lead(
                 self.db, chatbot_id=self.owner.chatbot_id, namespace=self.namespace, session_id=self.session_id,
-                visitor_id=self.visitor_id, host_page_url=self.host_page_url, contact=contact,
+                visitor_id=self.visitor_id, host_page_url=self.host_page_url, contact=contact, priority=priority,
             )
         except Exception:
             log.exception("auto-capture lead failed")
@@ -129,9 +133,22 @@ def _lead_payload(lead: Lead | dict, owner: LeadOwner) -> dict:
         "id": get("id"),
         "name": get("name") or "", "email": get("email") or "", "phone": get("phone") or "",
         "company": get("company") or "", "message": get("message") or "", "source": get("source") or "",
-        "status": get("status"), "chatbotId": owner.chatbot_id, "chatbot": owner.chatbot_name,
+        "status": get("status"), "priority": get("priority"), "chatbotId": owner.chatbot_id,
+        "chatbot": owner.chatbot_name,
         "createdAt": created.isoformat() if created else None,
     }
+
+
+def _lead_text(p: dict, chatbot_name: str) -> str:
+    """Short plain-text summary for chat-app destinations (Slack/Discord/Telegram)
+    — those expect a message, not the raw lead JSON the webhook/sheet destinations
+    get (Phase 3a of docs/AGENT_VISION.md)."""
+    lines = [f"New lead from {chatbot_name}"]
+    for label, key in (("Priority", "priority"), ("Name", "name"), ("Email", "email"),
+                       ("Phone", "phone"), ("Company", "company"), ("Message", "message")):
+        if p.get(key):
+            lines.append(f"{label}: {p[key]}")
+    return "\n".join(lines)
 
 
 def _lead_email_html(p: dict, chatbot_name: str) -> str:
@@ -139,7 +156,7 @@ def _lead_email_html(p: dict, chatbot_name: str) -> str:
         f'<tr><td style="padding:6px 14px 6px 0;color:#6b7280;font-size:13px;white-space:nowrap;'
         f'vertical-align:top;">{label}</td><td style="padding:6px 0;color:#111827;font-size:14px;">'
         f"{html.escape(str(p[key]))}</td></tr>"
-        for label, key in (("Name", "name"), ("Email", "email"), ("Phone", "phone"),
+        for label, key in (("Priority", "priority"), ("Name", "name"), ("Email", "email"), ("Phone", "phone"),
                            ("Company", "company"), ("Message", "message"), ("Page", "source"))
         if p.get(key)
     )
@@ -194,6 +211,29 @@ async def forward_lead(lead_id: str, owner: LeadOwner) -> None:
                 delivered.append(name)
             except Exception as exc:
                 log.error("%s forward failed: %r", name, exc)
+
+        text = _lead_text(payload, owner.chatbot_name)
+        for name, url, body in (
+            ("slack", config["slackWebhookUrl"], {"text": text}),
+            ("discord", config["discordWebhookUrl"], {"content": text}),
+        ):
+            if not url:
+                continue
+            try:
+                await _post_json(url, body)
+                delivered.append(name)
+            except Exception as exc:
+                log.error("%s forward failed: %r", name, exc)
+        if config["telegramBotToken"] and config["telegramChatId"]:
+            try:
+                await _post_json(
+                    f"https://api.telegram.org/bot{config['telegramBotToken']}/sendMessage",
+                    {"chat_id": config["telegramChatId"], "text": text},
+                )
+                delivered.append("telegram")
+            except Exception as exc:
+                log.error("telegram forward failed: %r", exc)
+
         if delivered:
             await db.execute(update(Lead).where(Lead.id == lead_id).values(synced_at=datetime.now(UTC)))
             await db.commit()
@@ -212,7 +252,7 @@ async def send_test_lead(owner: LeadOwner, destination: str, url_override: str |
     sample = {
         "id": "test-lead", "name": "Test Lead", "email": "test-lead@example.com", "phone": "+1 555 0100",
         "company": "Acme Inc", "message": "This is a test lead sent from your dashboard to verify the connection.",
-        "source": "dashboard-test", "status": "NEW", "created_at": datetime.now(UTC),
+        "source": "dashboard-test", "status": "NEW", "priority": "WARM", "created_at": datetime.now(UTC),
     }
     payload = _lead_payload(sample, owner)
     try:
@@ -223,7 +263,18 @@ async def send_test_lead(owner: LeadOwner, destination: str, url_override: str |
                              _lead_email_html(payload, owner.chatbot_name))
             return {"ok": True}
 
-        url = (url_override or "").strip() or (config["webhookUrl"] if destination == "webhook" else config["sheetUrl"])
+        if destination == "telegram":
+            token, chat_id = config["telegramBotToken"], config["telegramChatId"]
+            if not (token and chat_id):
+                return {"ok": False, "error": "Add both a bot token and a chat ID first"}
+            await _post_json(f"https://api.telegram.org/bot{token}/sendMessage",
+                             {"chat_id": chat_id, "text": f"[Test] {_lead_text(payload, owner.chatbot_name)}"})
+            return {"ok": True}
+
+        url = (url_override or "").strip() or {
+            "webhook": config["webhookUrl"], "sheet": config["sheetUrl"],
+            "slack": config["slackWebhookUrl"], "discord": config["discordWebhookUrl"],
+        }.get(destination, "")
         if not url:
             return {"ok": False, "error": "No URL configured yet — paste your URL first"}
         if not url.lower().startswith("https://"):
@@ -237,7 +288,13 @@ async def send_test_lead(owner: LeadOwner, destination: str, url_override: str |
                 f"(no “/a/macros/{domain}/”). Alternatively, ask your Workspace admin to allow Apps Script web apps "
                 "to be shared with “Anyone”."
             )}
-        await _post_json(url, {**payload, "test": True})
+        if destination == "slack":
+            body = {"text": f"[Test] {_lead_text(payload, owner.chatbot_name)}"}
+        elif destination == "discord":
+            body = {"content": f"[Test] {_lead_text(payload, owner.chatbot_name)}"}
+        else:
+            body = {**payload, "test": True}
+        await _post_json(url, body)
         return {"ok": True}
     except NotPublic:
         return {"ok": False, "error": (

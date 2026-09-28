@@ -104,7 +104,7 @@ export function ForwardTestButton({
   label = 'Send test',
 }: {
   chatbotId: string;
-  destination: 'email' | 'webhook' | 'sheet';
+  destination: 'email' | 'webhook' | 'sheet' | 'slack' | 'discord' | 'telegram';
   url?: string;
   label?: string;
 }) {
@@ -124,7 +124,7 @@ export function ForwardTestButton({
         variant="outline"
         size="sm"
         loading={testForward.isPending}
-        disabled={destination !== 'email' && !url?.trim()}
+        disabled={!['email', 'telegram'].includes(destination) && !url?.trim()}
         onClick={run}
         data-testid={`test-forward-${destination}`}
       >

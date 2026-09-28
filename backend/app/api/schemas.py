@@ -183,6 +183,7 @@ class LeadOut(CamelModel):
     fields: dict[str, Any] | None
     source: str | None
     status: str
+    priority: str
     synced_at: datetime | None
     created_at: datetime
 
@@ -205,7 +206,7 @@ class LeadStatusIn(BaseModel):
 
 
 class TestForwardIn(BaseModel):
-    destination: Literal["email", "webhook", "sheet"]
+    destination: Literal["email", "webhook", "sheet", "slack", "discord", "telegram"]
     url: str | None = None
 
 

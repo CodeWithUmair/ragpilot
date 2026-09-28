@@ -7,6 +7,7 @@ cookies — the signed session token comes back in a `set-auth-token` header
 (or the OAuth redirect fragment) and returns as `Authorization: Bearer …`.
 """
 
+import logging
 import secrets
 from urllib.parse import quote, urlencode
 
@@ -195,7 +196,8 @@ async def google_callback(request: Request, db: DB, code: str | None = None, sta
             info = (await client.get(
                 GOOGLE_USERINFO_URL, headers={"Authorization": f"Bearer {tokens['access_token']}"}
             )).raise_for_status().json()
-    except (httpx.HTTPError, KeyError):
+    except (httpx.HTTPError, KeyError) as exc:
+        logging.getLogger("ragpilot").exception("google oauth exchange failed: %r", exc)
         return _to_app("error=oauth_exchange")
 
     sub, email = info.get("sub"), (info.get("email") or "").lower()

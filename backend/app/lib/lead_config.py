@@ -17,6 +17,13 @@ DEFAULT_LEAD_CONFIG: dict[str, Any] = {
     "notifyEmail": True,
     "webhookUrl": "",
     "sheetUrl": "",
+    # Phase 3a of docs/AGENT_VISION.md: same "owner pastes an endpoint" shape
+    # as webhookUrl/sheetUrl above, just more chat apps. Telegram needs two
+    # values (a bot token AND a chat id) since it has no single webhook URL.
+    "slackWebhookUrl": "",
+    "discordWebhookUrl": "",
+    "telegramBotToken": "",
+    "telegramChatId": "",
 }
 
 
@@ -41,6 +48,10 @@ def resolve_lead_config(raw: Any) -> dict[str, Any]:
         "notifyEmail": raw.get("notifyEmail") is not False,
         "webhookUrl": raw["webhookUrl"].strip() if isinstance(raw.get("webhookUrl"), str) else "",
         "sheetUrl": raw["sheetUrl"].strip() if isinstance(raw.get("sheetUrl"), str) else "",
+        "slackWebhookUrl": raw["slackWebhookUrl"].strip() if isinstance(raw.get("slackWebhookUrl"), str) else "",
+        "discordWebhookUrl": raw["discordWebhookUrl"].strip() if isinstance(raw.get("discordWebhookUrl"), str) else "",
+        "telegramBotToken": raw["telegramBotToken"].strip() if isinstance(raw.get("telegramBotToken"), str) else "",
+        "telegramChatId": raw["telegramChatId"].strip() if isinstance(raw.get("telegramChatId"), str) else "",
     }
 
 
@@ -64,3 +75,26 @@ _LEAD_INTENT_RE = re.compile(
 
 def detect_lead_intent(text: str) -> bool:
     return bool(text) and bool(_LEAD_INTENT_RE.search(text))
+
+
+# Phase 1 of docs/AGENT_VISION.md: COLD/WARM/HOT tiering. Deterministic like
+# the intent regex above (D8 in DECISIONS.md) — runs on every message, so no
+# extra LLM call. Upgrade path is the same one D8 already names: an LLM
+# classifier node, only if this heuristic's precision proves insufficient.
+_URGENCY_RE = re.compile(
+    r"\b(asap|urgent(ly)?|right (away|now)|today|immediately|this week"
+    r"|ready to (buy|purchase|start|sign)|sign me up)\b",
+    re.I,
+)
+
+PRIORITY_RANK: dict[str, int] = {"COLD": 0, "WARM": 1, "HOT": 2}
+
+
+def score_lead_priority(text: str, *, intent: bool, has_handle_now: bool) -> str:
+    """No buying/contact intent yet → COLD. Intent plus urgency language or a
+    contact handle volunteered in the same message → HOT. Intent alone → WARM."""
+    if not intent:
+        return "COLD"
+    if has_handle_now or _URGENCY_RE.search(text or ""):
+        return "HOT"
+    return "WARM"

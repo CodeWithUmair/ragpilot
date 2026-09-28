@@ -781,6 +781,10 @@ function CustomizeTab({
     notifyEmail: chatbot.leadConfig?.notifyEmail ?? DEFAULT_LEAD_CONFIG.notifyEmail,
     webhookUrl: chatbot.leadConfig?.webhookUrl ?? '',
     sheetUrl: chatbot.leadConfig?.sheetUrl ?? '',
+    slackWebhookUrl: chatbot.leadConfig?.slackWebhookUrl ?? '',
+    discordWebhookUrl: chatbot.leadConfig?.discordWebhookUrl ?? '',
+    telegramBotToken: chatbot.leadConfig?.telegramBotToken ?? '',
+    telegramChatId: chatbot.leadConfig?.telegramChatId ?? '',
   });
 
   // ── Resizable split: drag the divider to widen the controls panel so the
@@ -879,8 +883,13 @@ function CustomizeTab({
               value={form.welcomeMessage}
               onChange={(e) => setForm({ ...form, welcomeMessage: e.target.value })}
               disabled={saving}
+              placeholder="What are you looking for today?"
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
             />
+            <p className="text-xs text-muted-foreground mt-1.5">
+              Ask a question instead of a plain hello — it gets visitors qualifying
+              themselves from message one.
+            </p>
           </div>
           <div>
             <label className="block text-xs font-medium mb-1.5 text-muted-foreground">Input placeholder</label>
@@ -1023,6 +1032,65 @@ function CustomizeTab({
                   <div className="mt-2">
                     <GoogleSheetGuide chatbotId={chatbotId} sheetUrl={leadConfig.sheetUrl} />
                   </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
+                    Slack — Incoming Webhook URL
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="url"
+                      placeholder="https://hooks.slack.com/services/..."
+                      value={leadConfig.slackWebhookUrl}
+                      onChange={(e) => setLeadConfig((c) => ({ ...c, slackWebhookUrl: e.target.value }))}
+                      disabled={saving}
+                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
+                    />
+                    <ForwardTestButton chatbotId={chatbotId} destination="slack" url={leadConfig.slackWebhookUrl} />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
+                    Discord — Webhook URL
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="url"
+                      placeholder="https://discord.com/api/webhooks/..."
+                      value={leadConfig.discordWebhookUrl}
+                      onChange={(e) => setLeadConfig((c) => ({ ...c, discordWebhookUrl: e.target.value }))}
+                      disabled={saving}
+                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
+                    />
+                    <ForwardTestButton chatbotId={chatbotId} destination="discord" url={leadConfig.discordWebhookUrl} />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
+                    Telegram — Bot token + Chat ID
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="Bot token"
+                      value={leadConfig.telegramBotToken}
+                      onChange={(e) => setLeadConfig((c) => ({ ...c, telegramBotToken: e.target.value }))}
+                      disabled={saving}
+                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Chat ID"
+                      value={leadConfig.telegramChatId}
+                      onChange={(e) => setLeadConfig((c) => ({ ...c, telegramChatId: e.target.value }))}
+                      disabled={saving}
+                      className="w-28 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
+                    />
+                    <ForwardTestButton chatbotId={chatbotId} destination="telegram" label="Test" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    Save your settings first — the test message uses what&apos;s saved, not what&apos;s typed above.
+                  </p>
                 </div>
               </div>
             </div>

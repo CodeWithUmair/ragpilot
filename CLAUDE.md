@@ -120,3 +120,4 @@ docs/                  the project memory — see below
 | `docs/HISTORY.md` | Origin of the project, what the port changed, bugs fixed, security incident |
 | `docs/ROADMAP.md` | Planning new work (vector DB swap, evals, MCP server, …) |
 | `docs/STORY.md` | Explaining the project to a client/interviewer |
+| `docs/AGENT_VISION.md` | Proposed (undecided) design for evolving the chat bot into a lead-qualifying, action-taking agent |

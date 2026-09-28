@@ -57,12 +57,14 @@ class FakeStore:
 class FakeLeads:
     known: ExtractedContact = field(default_factory=ExtractedContact)
     captured: list[ExtractedContact] = field(default_factory=list)
+    priorities: list[str] = field(default_factory=list)
 
     async def known_contact(self):
         return self.known
 
-    async def capture(self, contact):
+    async def capture(self, contact, *, priority="COLD"):
         self.captured.append(contact)
+        self.priorities.append(priority)
 
 
 async def run(question, history=(), *, scores=None, leads=None, lead_enabled=False, llm=None):
@@ -145,6 +147,8 @@ async def test_volunteered_contact_is_captured_and_form_suppressed():
     assert final["show_lead_form"] is False
     assert leads.captured[0].email == "sara@acme.io" and leads.captured[0].name == "Sara"
     assert "name: Sara" in llm.stream_calls[0][0]["content"]  # agent memory reached the prompt
+    # Intent + a handle volunteered in the same message → HOT (docs/AGENT_VISION.md phase 1).
+    assert leads.priorities[0] == "HOT"
 
 
 async def test_known_contact_suppresses_form():
@@ -152,3 +156,18 @@ async def test_known_contact_suppresses_form():
     history = [{"question": "hi", "answer": "hello"}]
     _, final, _, _ = await run("can I book a demo?", history, lead_enabled=True, leads=leads)
     assert final["show_lead_form"] is False
+
+
+async def test_priority_is_cold_for_a_volunteered_name_without_intent():
+    """Capturing a name is not itself buying intent — see D8/D17 in DECISIONS.md."""
+    leads = FakeLeads()
+    _, _, _, _ = await run("My name is Sara, by the way.", lead_enabled=True, leads=leads)
+    assert leads.captured[0].name == "Sara"
+    assert leads.priorities[0] == "COLD"
+
+
+async def test_priority_is_warm_for_plain_intent_no_handle():
+    leads = FakeLeads()
+    history = [{"question": "what do you do?", "answer": "We build chatbots."}]
+    await run("I'm interested, how much?", history, lead_enabled=True, leads=leads)
+    assert leads.priorities[0] == "WARM"

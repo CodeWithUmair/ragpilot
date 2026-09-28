@@ -66,10 +66,10 @@ Frames are `event: X\ndata: <single-line JSON>\n\n`.
 | DELETE `/api/chatbots/{id}` | `{success}` (also deletes its vectors) |
 | POST `/api/chatbots/{id}/categories` `{categories: [{name, pages, enabled, indexed}], isTrained?, lastTrainedAt?}` | `{chatbot}` |
 | POST `/api/chatbots/{id}/reset-knowledge` | `{success}` |
-| GET `/api/chatbots/{id}/leads?page&limit&status` | `{leads, total, newCount, page, limit}` |
+| GET `/api/chatbots/{id}/leads?page&limit&status&priority` | `{leads, total, newCount, page, limit}` |
 | PATCH `/api/chatbots/{id}/leads/{leadId}` `{status}` | `{lead}` |
 | GET `/api/chatbots/{id}/leads/export` | CSV download |
-| POST `/api/chatbots/{id}/leads/test-forward` `{destination: email|webhook|sheet, url?}` | 200 `{ok:true}` / 502 `{ok:false, error}` |
+| POST `/api/chatbots/{id}/leads/test-forward` `{destination: email\|webhook\|sheet\|slack\|discord\|telegram, url?}` | 200 `{ok:true}` / 502 `{ok:false, error}` — telegram ignores `url` and uses the saved bot token/chat ID |
 | GET `/api/sessions/{namespace}?page&limit` | `{sessions: [{id, sessionId, visitorId, firstQuestion, messageCount, status, startedAt, lastActivityAt, hostPageUrl}], total, page, limit}` |
 | GET `/api/analytics?chatbotId=all|<id>&from=YYYY-MM-DD&to=YYYY-MM-DD` | `{range, totals{conversations, messages, leads, visitors, conversionRate}, previous, series[{date, conversations, messages, leads}], hourly[{hour, messages}], leadStatus, topQuestions, topPages, bots}` |
 | GET `/api/admin/users?search&page&limit` | admin only: `{users: [{…, createdAt, chatbotCount}], total, page, limit}` |

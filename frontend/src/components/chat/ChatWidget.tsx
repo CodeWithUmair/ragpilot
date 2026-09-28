@@ -629,7 +629,7 @@ function ChatView(props: {
       <div className="ragpilot-scroll" style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 8px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {messages.length === 0 && (
           <Bubble role="assistant" themeColor={themeColor}>
-            {botInfo?.welcomeMessage?.trim() || `Hi! I'm ${botName}. Ask me anything.`}
+            {botInfo?.welcomeMessage?.trim() || `Hi! I'm ${botName}. What are you looking for today?`}
           </Bubble>
         )}
 

@@ -61,6 +61,9 @@ ChatbotStatus = _enum("ACTIVE", "TRAINING", "INACTIVE", name="ChatbotStatus")
 WidgetTheme = _enum("light", "dark", "auto", name="WidgetTheme")
 SessionStatus = _enum("ACTIVE", "CLOSED", name="SessionStatus")
 LeadStatus = _enum("NEW", "CONTACTED", "ARCHIVED", name="LeadStatus")
+# Orthogonal to LeadStatus: status is workflow (has the owner followed up),
+# priority is how promising the lead looks. See docs/AGENT_VISION.md phase 1.
+LeadPriority = _enum("COLD", "WARM", "HOT", name="LeadPriority")
 
 
 class Base(DeclarativeBase):
@@ -223,6 +226,7 @@ class Lead(Base):
     fields: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     source: Mapped[str | None] = mapped_column(String)
     status: Mapped[str] = mapped_column(LeadStatus, default="NEW")
+    priority: Mapped[str] = mapped_column(LeadPriority, default="COLD")
     synced_at: Mapped[datetime | None] = mapped_column("syncedAt", UTCDateTime)
     created_at: Mapped[datetime] = created_col()
 

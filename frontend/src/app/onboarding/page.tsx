@@ -163,7 +163,9 @@ export default function OnboardingPage() {
         name: data.businessName || undefined,
         systemPrompt: personality.systemPrompt,
         personalityType: data.personality,
-        welcomeMessage: data.welcomeMessage || `Hi! I'm ${data.businessName || 'your assistant'}. How can I help?`,
+        welcomeMessage:
+          data.welcomeMessage ||
+          `Hi! I'm ${data.businessName || 'your assistant'}. What are you looking for today?`,
         themeColor: data.themeColor,
         primaryColor: data.themeColor,
         // Pro users get clean (unbranded) widget; Free users see "Powered by".
@@ -508,6 +510,11 @@ function AppearanceStep({
             rows={3}
             className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
           />
+          <p className="text-xs text-muted-foreground mt-1.5">
+            Ask a question instead of just saying hello — it gets visitors qualifying
+            themselves from message one (e.g. &ldquo;What are you looking for today?&rdquo;
+            beats &ldquo;How can I help?&rdquo;).
+          </p>
         </div>
 
         {/* Live preview */}
@@ -521,7 +528,8 @@ function AppearanceStep({
               <MessageCircle className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 rounded-2xl rounded-bl-sm border border-border bg-card px-3 py-2 text-sm">
-              {data.welcomeMessage || `Hi! I'm ${data.businessName || 'your assistant'}. How can I help?`}
+              {data.welcomeMessage ||
+                `Hi! I'm ${data.businessName || 'your assistant'}. What are you looking for today?`}
             </div>
           </div>
         </div>

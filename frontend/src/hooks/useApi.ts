@@ -56,6 +56,10 @@ export interface LeadConfig {
   notifyEmail: boolean;
   webhookUrl?: string;
   sheetUrl?: string;
+  slackWebhookUrl?: string;
+  discordWebhookUrl?: string;
+  telegramBotToken?: string;
+  telegramChatId?: string;
 }
 
 export const DEFAULT_LEAD_CONFIG: LeadConfig = {
@@ -67,9 +71,14 @@ export const DEFAULT_LEAD_CONFIG: LeadConfig = {
   notifyEmail: true,
   webhookUrl: '',
   sheetUrl: '',
+  slackWebhookUrl: '',
+  discordWebhookUrl: '',
+  telegramBotToken: '',
+  telegramChatId: '',
 };
 
 export type LeadStatus = 'NEW' | 'CONTACTED' | 'ARCHIVED';
+export type LeadPriority = 'COLD' | 'WARM' | 'HOT';
 
 export interface Lead {
   id: string;
@@ -84,6 +93,7 @@ export interface Lead {
   message: string | null;
   source: string | null;
   status: LeadStatus;
+  priority: LeadPriority;
   syncedAt: string | null;
   createdAt: string;
 }
@@ -441,7 +451,13 @@ export function useAnalytics(filters: AnalyticsFilters) {
 /** Send a sample lead to one forwarding destination to verify the wiring. */
 export function useTestLeadForward(chatbotId: string) {
   return useMutation({
-    mutationFn: async ({ destination, url }: { destination: 'email' | 'webhook' | 'sheet'; url?: string }) => {
+    mutationFn: async ({
+      destination,
+      url,
+    }: {
+      destination: 'email' | 'webhook' | 'sheet' | 'slack' | 'discord' | 'telegram';
+      url?: string;
+    }) => {
       try {
         const { data } = await api.post(`/chatbots/${chatbotId}/leads/test-forward`, { destination, url });
         return data as { ok: boolean; error?: string };

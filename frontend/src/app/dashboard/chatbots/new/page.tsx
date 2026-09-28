@@ -124,7 +124,7 @@ export default function NewChatbotPage() {
     showPoweredBy: true,
     personalityType: 'general',
     customPrompt: '',
-    welcomeMessage: 'Hey! How can I help you today?',
+    welcomeMessage: 'Hey! What are you looking for today?',
   });
 
   function update<K extends keyof OnboardingState>(key: K, value: OnboardingState[K]) {
@@ -438,9 +438,13 @@ function Step2Appearance({ state, update }: StepProps) {
         <input
           value={state.welcomeMessage}
           onChange={(e) => update('welcomeMessage', e.target.value)}
-          placeholder="Hey! How can I help you today?"
+          placeholder="Hey! What are you looking for today?"
           className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
+        <p className="text-xs text-muted-foreground">
+          A question gets visitors qualifying themselves from message one — beats a
+          plain hello.
+        </p>
       </div>
 
       {/* Theme */}
@@ -682,7 +686,7 @@ function ChatPreview({ state }: { state: OnboardingState }) {
   const borderColor = isDark ? '#374151' : '#e5e7eb';
 
   const demoMessages = [
-    { role: 'assistant', content: state.welcomeMessage || 'Hey! How can I help you today?' },
+    { role: 'assistant', content: state.welcomeMessage || 'Hey! What are you looking for today?' },
     { role: 'user', content: 'What services do you offer?' },
     { role: 'assistant', content: "Great question! I can help you explore our offerings. What are you looking for specifically?" },
   ];

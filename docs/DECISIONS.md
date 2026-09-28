@@ -90,3 +90,32 @@ break behind PgBouncer transaction pooling.
 
 ### D16 — Public GitHub repo
 Chosen by the owner for portfolio visibility (2026-09-27).
+
+### D17 — Lead priority (COLD/WARM/HOT) as a heuristic, not an LLM classifier (2026-09-28)
+**Why:** Phase 1 of the agent-vision initiative (`docs/AGENT_VISION.md`) —
+tier leads by how promising they look. Scored with a regex/keyword heuristic
+in `lib/lead_config.score_lead_priority`, same pattern and same reasoning as
+D8 (`detect_lead_intent`, `extract_contact`): it runs on every message, so an
+LLM call there would double the per-message cost project-wide, and getting
+tiering roughly right cheaply beats getting it precisely right expensively.
+Priority is a new `Lead.priority` column, deliberately separate from
+`Lead.status` (status is workflow — has the owner followed up; priority is
+how hot the lead looks — orthogonal axes). Upgrade-only: a lead's priority
+can rise across turns (visitor shows more urgency later) but never falls,
+matching the existing upgrade-only merge for name/company in
+`capture_chat_lead`. **Rejected:** an LLM classifier node per message (cost);
+overloading `Lead.status` with tiers (conflates two different questions an
+owner asks about a lead). **Upgrade path:** an LLM classifier, only if this
+heuristic's precision proves insufficient in practice — same upgrade path D8
+already names, now used twice.
+
+### D18 — Phase 2 proactive opener: owner-authored, not generated (2026-09-28)
+**Why:** three options existed (owner writes it, auto-template from persona,
+LLM-generated per session) — `welcomeMessage` already exists as an editable
+field, so the cheapest version of "proactive engagement" is better dashboard
+guidance/placeholder copy nudging owners toward a qualifying question,
+zero new backend or graph code. **Rejected:** auto-generating a persona-aware
+default (real logic for a problem a text hint mostly solves) and an
+LLM-generated per-session opener (a per-widget-open cost, including for
+visitors who bounce before typing). **Upgrade path:** revisit auto-generation
+only if owners' self-written openers are consistently weak in practice.

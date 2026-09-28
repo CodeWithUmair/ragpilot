@@ -31,7 +31,7 @@ from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, StateGraph
 
 from app.lib.contact_extract import ExtractedContact, extract_contact, has_contact_handle
-from app.lib.lead_config import detect_lead_intent
+from app.lib.lead_config import detect_lead_intent, score_lead_priority
 from app.rag import retrieval
 from app.rag.prompts import REWRITE_SYSTEM, build_system_prompt, history_messages
 from app.rag.providers import ChatModel, Embedder
@@ -54,7 +54,7 @@ class LeadStore(Protocol):
 
     async def known_contact(self) -> ExtractedContact: ...
 
-    async def capture(self, contact: ExtractedContact) -> None: ...
+    async def capture(self, contact: ExtractedContact, *, priority: str = "COLD") -> None: ...
 
 
 @dataclass
@@ -179,15 +179,22 @@ async def capture_lead(state: ChatState, config: RunnableConfig) -> dict:
 
     question = state["question"]
     typed = extract_contact(question)
-    if deps.leads and (has_contact_handle(question) or typed.name or typed.company):
-        await deps.leads.capture(typed)
+    intent = detect_lead_intent(question)
+    has_handle_now = has_contact_handle(question)
+    # Fire on intent too, not just a volunteered handle — a returning visitor
+    # who already gave contact info can still upgrade their own priority by
+    # showing urgency later in the conversation (capture() is upgrade-only,
+    # see services/leads.py).
+    if deps.leads and (has_handle_now or typed.name or typed.company or intent):
+        priority = score_lead_priority(question, intent=intent, has_handle_now=has_handle_now)
+        await deps.leads.capture(typed, priority=priority)
 
     contact = state.get("contact", ExtractedContact())
     show = (
-        detect_lead_intent(question)
+        intent
         and len(state["history"]) >= LEAD_FORM_MIN_PRIOR_TURNS
         and not (contact.email or contact.phone)
-        and not has_contact_handle(question)
+        and not has_handle_now
     )
     if show:
         get_stream_writer()(

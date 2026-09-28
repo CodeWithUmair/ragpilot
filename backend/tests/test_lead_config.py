@@ -2,7 +2,13 @@
 
 import pytest
 
-from app.lib.lead_config import DEFAULT_LEAD_CONFIG, detect_lead_intent, public_lead_config, resolve_lead_config
+from app.lib.lead_config import (
+    DEFAULT_LEAD_CONFIG,
+    detect_lead_intent,
+    public_lead_config,
+    resolve_lead_config,
+    score_lead_priority,
+)
 
 
 @pytest.mark.parametrize("raw", [None, "junk", 42, [], [{"enabled": True}]])
@@ -32,6 +38,7 @@ def test_partial_config_is_filled_and_cleaned():
             "notifyEmail": None,
             "webhookUrl": "  https://hooks.example.com/x  ",
             "sheetUrl": 123,
+            "slackWebhookUrl": "  https://hooks.slack.com/x  ",
         }
     )
     assert c == {
@@ -44,6 +51,10 @@ def test_partial_config_is_filled_and_cleaned():
         "notifyEmail": True,  # only an explicit False turns it off
         "webhookUrl": "https://hooks.example.com/x",
         "sheetUrl": "",
+        "slackWebhookUrl": "https://hooks.slack.com/x",
+        "discordWebhookUrl": "",
+        "telegramBotToken": "",
+        "telegramChatId": "",
     }
 
 
@@ -101,3 +112,28 @@ def test_intent_detected(text):
 )
 def test_no_intent(text):
     assert not detect_lead_intent(text)
+
+
+def test_priority_cold_without_intent():
+    assert score_lead_priority("What does your company do?", intent=False, has_handle_now=False) == "COLD"
+
+
+def test_priority_warm_on_plain_intent():
+    assert score_lead_priority("I'd like to talk to someone", intent=True, has_handle_now=False) == "WARM"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "I need this asap",
+        "Can we start today?",
+        "I'm ready to buy",
+        "sign me up",
+    ],
+)
+def test_priority_hot_on_urgency(text):
+    assert score_lead_priority(text, intent=True, has_handle_now=False) == "HOT"
+
+
+def test_priority_hot_when_handle_volunteered_same_turn():
+    assert score_lead_priority("book a demo, sara@acme.io", intent=True, has_handle_now=True) == "HOT"

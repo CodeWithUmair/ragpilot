@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, Mail, Phone, Building2, Download, ExternalLink, Send } from 'lucide-react';
+import { Users, Mail, Phone, Building2, Download, ExternalLink, Send, Flame } from 'lucide-react';
 import {
   useChatbots,
   useLeads,
@@ -10,6 +10,7 @@ import {
   downloadLeadsCsv,
   type Lead,
   type LeadStatus,
+  type LeadPriority,
 } from '../../../hooks/useApi';
 import { cn } from '../../../lib/utils';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -20,6 +21,14 @@ const STATUS_STYLES: Record<LeadStatus, string> = {
   NEW: 'bg-primary/10 text-primary',
   CONTACTED: 'bg-green-500/10 text-green-600 dark:text-green-400',
   ARCHIVED: 'bg-muted text-muted-foreground',
+};
+
+// Read-only signal from the agent (docs/AGENT_VISION.md phase 1) — not owner-editable,
+// unlike status, so no button row for it.
+const PRIORITY_STYLES: Record<LeadPriority, string> = {
+  COLD: 'bg-muted text-muted-foreground',
+  WARM: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  HOT: 'bg-red-500/10 text-red-600 dark:text-red-400',
 };
 
 export default function LeadsPage() {
@@ -103,14 +112,27 @@ export default function LeadsPage() {
                       <p className="text-sm font-medium truncate">
                         {lead.name || lead.email || lead.phone || 'Lead'}
                       </p>
-                      <span
-                        className={cn(
-                          'text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0',
-                          STATUS_STYLES[lead.status],
+                      <div className="flex items-center gap-1 shrink-0">
+                        {lead.priority !== 'COLD' && (
+                          <span
+                            className={cn(
+                              'text-[10px] font-medium px-1.5 py-0.5 rounded-full flex items-center gap-0.5',
+                              PRIORITY_STYLES[lead.priority],
+                            )}
+                          >
+                            {lead.priority === 'HOT' && <Flame className="h-2.5 w-2.5" />}
+                            {lead.priority}
+                          </span>
                         )}
-                      >
-                        {lead.status}
-                      </span>
+                        <span
+                          className={cn(
+                            'text-[10px] font-medium px-1.5 py-0.5 rounded-full',
+                            STATUS_STYLES[lead.status],
+                          )}
+                        >
+                          {lead.status}
+                        </span>
+                      </div>
                     </div>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">
                       {lead.email || lead.phone || '—'}
@@ -159,15 +181,29 @@ function LeadDetail({ lead, chatbotId }: { lead: Lead; chatbotId: string }) {
               Captured {format(new Date(lead.createdAt), "p '·' MMM d, yyyy")}
             </p>
           </div>
-          {lead.syncedAt && (
-            <span
-              className="ml-auto flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400 bg-green-500/10 px-2 py-1 rounded-full shrink-0"
-              title={`Forwarded ${format(new Date(lead.syncedAt), "p '·' MMM d, yyyy")} (email / webhook / sheet)`}
-            >
-              <Send className="h-3 w-3" />
-              Forwarded
-            </span>
-          )}
+          <div className="ml-auto flex items-center gap-2 shrink-0">
+            {lead.priority !== 'COLD' && (
+              <span
+                className={cn(
+                  'flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full',
+                  PRIORITY_STYLES[lead.priority],
+                )}
+                title="How promising this lead looks, scored from the conversation — not owner-editable"
+              >
+                {lead.priority === 'HOT' && <Flame className="h-3 w-3" />}
+                {lead.priority}
+              </span>
+            )}
+            {lead.syncedAt && (
+              <span
+                className="flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400 bg-green-500/10 px-2 py-1 rounded-full"
+                title={`Forwarded ${format(new Date(lead.syncedAt), "p '·' MMM d, yyyy")} (email / webhook / sheet)`}
+              >
+                <Send className="h-3 w-3" />
+                Forwarded
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Status selector */}

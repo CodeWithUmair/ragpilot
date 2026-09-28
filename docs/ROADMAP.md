@@ -39,6 +39,13 @@ The seam already exists: `backend/app/rag/vector_store.py` (`VectorStore` protoc
 Also worth evaluating: hybrid search (pgvector + Postgres full-text `tsvector` with RRF) before
 leaving Postgres — the current lexical boost is a lightweight stand-in.
 
+## Sales agent initiative (see `docs/AGENT_VISION.md`)
+- [x] Phase 1: lead tiering (COLD/WARM/HOT) — heuristic, no new LLM cost (2026-09-28, D17)
+- [x] Phase 2: proactive/qualifying opener — owner writes it, dashboard copy only (2026-09-28, D18)
+- [ ] Phase 3a: multi-channel lead notifications (Slack/Discord/Telegram/WhatsApp) — extension of Phase 1's forwarding, not agentic
+- [ ] Phase 3b: "here's the checkout link" — prompt/retrieval change using existing `sources`, no tool execution
+- [ ] Phase 3c: real tool-calling (add-to-cart, calendar booking, spreadsheet write-back) — deferred until 1, 2, 3a, 3b are live and the LLM call-log table exists
+
 ## Later
 - [ ] Training as a background job (Arq or a Postgres job table) with progress polling/SSE —
       survives disconnects and redeploys; allows > 50 pages and scheduled re-crawls
