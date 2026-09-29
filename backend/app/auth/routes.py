@@ -199,6 +199,11 @@ async def google_callback(request: Request, db: DB, code: str | None = None, sta
             info = (await client.get(
                 GOOGLE_USERINFO_URL, headers={"Authorization": f"Bearer {tokens['access_token']}"}
             )).raise_for_status().json()
+    except httpx.HTTPStatusError as exc:
+        logging.getLogger("ragpilot").error(
+            "google oauth exchange failed: %s %s -> %s", exc.request.method, exc.request.url, exc.response.text
+        )
+        return _to_app("error=oauth_exchange")
     except (httpx.HTTPError, KeyError) as exc:
         logging.getLogger("ragpilot").exception("google oauth exchange failed: %r", exc)
         return _to_app("error=oauth_exchange")
