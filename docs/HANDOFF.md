@@ -1,14 +1,20 @@
 # Handoff — current state of RagPilot
 
-_Last updated: 2026-09-27. Update this file at the end of every working session:
+_Last updated: 2026-09-29. Update this file at the end of every working session:
 what changed, what is live, what is next._
 
 ## TL;DR
 
-The FastAPI + LangGraph backend is complete, tested (204 tests green locally and
-in CI) and pushed to GitHub. **Nothing is deployed yet.** Deployment is being done
-manually by the owner: Neon (DB) → DigitalOcean App Platform (API) → Vercel
-(frontend). The custom domain `rag.umairamir.com` comes later (DNS not configured).
+The FastAPI + LangGraph backend is complete, tested (219 tests green locally,
+last run 2026-09-28) and pushed to GitHub. Beyond the original port, it now has
+lead tiering, an owner-authored proactive opener, Slack/Discord/Telegram lead
+forwarding, a checkout-link guardrail, and interactive source cards/quick-reply
+chips in the widget (see `docs/AGENT_VISION.md` — phases 1-3b shipped, 3c
+real tool-calling explicitly paused). Verified against a **real** OpenAI key
+locally (trained + chatted end-to-end), which caught and fixed a real config bug.
+**Nothing is deployed yet.** Deployment is being done manually by the owner:
+Neon (DB) → DigitalOcean App Platform (API) → Vercel (frontend). The custom
+domain `rag.umairamir.com` comes later (DNS not configured).
 
 ## Status board
 
@@ -18,7 +24,7 @@ manually by the owner: Neon (DB) → DigitalOcean App Platform (API) → Vercel
 | LangGraph chat agent | ✅ Done | `backend/app/rag/graph.py`, 8 graph tests with fake models |
 | Better-Auth-compatible auth | ✅ Done | Hash/token compat verified against Node-generated fixtures |
 | Alembic migrations | ✅ Done | Verified on a fresh DB and on a simulated legacy Prisma DB (data kept, HNSW index restored) |
-| Tests | ✅ 204 passing | Unit + graph + integration (real Postgres/pgvector) |
+| Tests | ✅ 219 passing | Unit + graph + integration (real Postgres/pgvector) |
 | CI (GitHub Actions) | ✅ Green | Backend: ruff + pytest with pgvector service. Frontend: `pnpm build` |
 | Docker images | ✅ Build & run | API runs migrations then uvicorn; web runs Next standalone |
 | Frontend rebrand RagBot → RagPilot | ✅ Done | Also fixed a broken embed snippet (`cdn.ragbot.ai` didn't exist) |
@@ -57,12 +63,28 @@ Later, with DNS: either keep Vercel + DO and point `rag.umairamir.com` at Vercel
 
 ## Environment facts
 
-- Local dev machine: Windows 11, Git Bash + PowerShell, uv 0.11, Python 3.12 (uv-managed), Node via nvm4w, pnpm, Docker Desktop.
-- A local test DB container may exist: `ragpilot-pg` (`pgvector/pgvector:pg17`) on
-  `postgresql://postgres:postgres@localhost:5433/ragpilot`. Stop with `docker stop ragpilot-pg`.
-- The old Express codebase lives at `D:\mine\dl-chat-rag` (reference only — see `docs/HISTORY.md`).
+- Local dev machine: Windows 11, Git Bash + PowerShell, uv (auto-installed to
+  `~/.local/bin` if missing), Python 3.12 (uv-managed), Node via nvm4w, pnpm, Docker Desktop.
+- The dev Postgres+pgvector container (`docker-compose.dev.yml`, service `db`,
+  container `ragpilot-dev-db-1`) is mapped to **port 5433, not 5432** — a native
+  `postgresql-x64-18` Windows service already owns 5432 on this machine. `DATABASE_URL`
+  in `backend/.env` must say `:5433`. Nothing here persists across sessions/reboots —
+  `docker compose -f docker-compose.dev.yml up -d` before doing anything else.
+- **Nothing survives a session restart**: Docker Desktop, the backend (`uv run fastapi dev`),
+  and the frontend (`pnpm dev`) all need to be started fresh each session. Check with
+  `curl http://127.0.0.1:4000/health`, `curl http://localhost:3000`, `docker ps` before
+  assuming anything is already running.
+- The old Express codebase's local clone is at `C:\Users\Ali\Desktop\Umair\chatbase-clone`
+  (locally renamed — NOT named `dl-chat-rag`; found via VS Code's history DB, not a
+  filename search). Confirmed clean as currently checked out; the malware IS present in
+  its git history (commit `6144e0e`) — see `docs/HISTORY.md`'s 2026-09-29 addendum before
+  touching that folder at all, especially before checking out any old commit in it.
 - `gh` CLI is logged in as `CodeWithUmair`. The Vercel CLI on this machine is logged into a
   *different* account — don't deploy with it unless the owner confirms.
+- `backend/.env` has a real `OPENAI_API_KEY` and Google OAuth credentials as of
+  2026-09-28 — don't overwrite them. Editing `backend/.env` while the backend is running
+  needs a manual restart to take effect (`Settings` is `@lru_cache`d; the file-watcher
+  reloader only reacts to `.py` changes, not `.env`).
 
 ## Known gaps / tech debt (prioritised)
 
@@ -105,4 +127,12 @@ Later, with DNS: either keep Vercel + DO and point `rag.umairamir.com` at Vercel
   immediately caught a real bug: `OPENAI_BASE_URL=` (present but empty) resolved to `""`,
   and `AsyncOpenAI(base_url="")` is not the same as unset — every LLM call failed with
   `APIConnectionError`. Fixed at the `Settings` layer (`core/config.py`) so blank means
-  `None`, not literal, with a regression test. Pushed in two commits.
+  `None`, not literal, with a regression test. Pushed in two commits. Also located and
+  forensically audited the old local clone (`C:\Users\Ali\Desktop\Umair\chatbase-clone`) —
+  confirmed the malware is real, in commit `6144e0e`, still reachable from that clone's
+  `main`; current checkout is clean. See `docs/HISTORY.md`'s addendum. Read-only, nothing
+  in that folder was touched.
+- **2026-09-29** — Session restart: nothing from the previous session persists (Docker,
+  backend, frontend dev servers all need restarting). Corrected a stale fact in this file
+  (old repo path was documented as `D:\mine\dl-chat-rag`, which doesn't exist on this
+  machine — the real local clone and path are noted above).

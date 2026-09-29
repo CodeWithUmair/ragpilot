@@ -70,3 +70,43 @@ the "fake project / contagious interview" family:
 never copy files wholesale from the old repo; review diffs to config files
 (`postcss.config.*`, `next.config.*`, `package.json` scripts) with the whitespace
 visible; rotate any secret that existed on machines/CI that built the old frontend.
+
+### Local clone located and forensically confirmed (2026-09-29)
+
+The pre-port local clone of `github.com/decryptedlabs/dl-chat-rag` is at
+**`C:\Users\Ali\Desktop\Umair\chatbase-clone`** on this dev machine — locally
+renamed, not findable by searching for "dl-chat-rag" (confirmed via
+`git remote -v`; the path was recovered from VS Code's own history database,
+`AppData\Roaming\Code\User\globalStorage\state.vscdb`, after a filename
+search turned up nothing). `docs/HANDOFF.md`'s old note that it lived at
+`D:\mine\dl-chat-rag` was stale/wrong for this machine — corrected there.
+
+Audited that local clone directly:
+- **Current checked-out tree (HEAD `c39f86f`, 2026-06-15) is clean** — no
+  `.vscode`/`tasks.json` anywhere on disk, `postcss.config.mjs` is the normal
+  ~100-byte file, and a repo-wide scan for anomalously long/padded lines
+  found nothing else.
+- **But the malware IS present in this branch's git history**, not just a
+  rumor: commit `6144e0e` ("verfication email changes", authored
+  **2026-05-13 08:31:37 -0700** by `umairamir007 <umairamir@decryptedlabs.io>`
+  — the owner's own identity, matching "introduced under the owner's work
+  identity" above) has `frontend/postcss.config.mjs` at **5460 bytes** versus
+  ~70-94 bytes in every neighboring commit. Confirmed `6144e0e` is an
+  ancestor of this local clone's `main` (`git merge-base --is-ancestor`).
+  Peeked at only the first/last ~150 characters (never executed or fully
+  dumped it) — the tail is unmistakably obfuscated JS (mangled names,
+  string-reassembly, wrapped in an IIFE).
+- This local clone predates the cleanup: `b40f9bf` (the fix commit mentioned
+  above) does not exist as an object in it at all — it simply stopped
+  syncing before that fix, with later legitimate commits happening to
+  overwrite the file back to normal.
+- **Implication that generalizes beyond this one clone:** "removing" malware
+  by pushing a fix commit does not erase it from git history — the poisoned
+  commit stays reachable by SHA (`git show`, `git checkout`, `git blame`,
+  GitHub's own commit-history view) unless someone does an actual history
+  rewrite (`git filter-repo`/BFG + force-push). Whether `decryptedlabs/dl-chat-rag`
+  on GitHub itself still has `6144e0e` reachable hasn't been checked from
+  here — worth confirming if the goal is for it to be permanently gone, since
+  anyone cloning or forking it would get the malicious commit too.
+
+No changes were made to that local clone or its git state — read-only audit only.
