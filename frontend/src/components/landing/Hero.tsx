@@ -72,7 +72,7 @@ function HeroChatCard() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
               href="#problem"
-              className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary bg-primary/8 rounded-full px-2.5 py-1 w-fit"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/8 rounded-full px-2.5 py-1 w-fit"
             >
               <ExternalLink className="h-3 w-3" /> acme-widgets.com/services
             </motion.a>

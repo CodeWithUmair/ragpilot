@@ -98,7 +98,7 @@ export function ArchitectureFlow() {
                 <p className={`text-xs font-semibold transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
                   {s.title}
                 </p>
-                <p className="text-[11px] text-muted-foreground hidden sm:block">{s.blurb}</p>
+                <p className="text-xs text-muted-foreground hidden sm:block">{s.blurb}</p>
               </button>
             );
           })}

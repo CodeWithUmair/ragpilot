@@ -323,7 +323,7 @@ export default function AnalyticsPage() {
                     <EmptyNote>No chatbots yet.</EmptyNote>
                   ) : (
                     <div className="space-y-1">
-                      <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-2 pb-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                      <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-2 pb-1 text-xs uppercase tracking-wide text-muted-foreground">
                         <span>Chatbot</span><span>Convos</span><span>Leads</span>
                       </div>
                       {data.bots.map((b) => (
@@ -395,7 +395,7 @@ function StatCard({
           </span>
         ) : null}
       </div>
-      <p className="text-[11px] text-muted-foreground mt-1">
+      <p className="text-xs text-muted-foreground mt-1">
         {hint ?? 'vs. previous period'}
       </p>
     </div>

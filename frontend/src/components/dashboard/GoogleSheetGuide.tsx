@@ -45,7 +45,7 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
       <>
         In the Sheet&apos;s menu bar click{' '}
         <span className="font-medium text-foreground">Extensions → Apps Script</span>. A new tab
-        opens with an empty <code className="text-[11px] bg-muted px-1 py-0.5 rounded">Code.gs</code> file.
+        opens with an empty <code className="text-xs bg-muted px-1 py-0.5 rounded">Code.gs</code> file.
       </>
     ),
   },
@@ -68,7 +68,7 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
         <span className="font-medium text-foreground">Who has access: Anyone</span>. Click{' '}
         <span className="font-medium text-foreground">Deploy</span> and authorize when Google asks
         (Advanced → Go to project if you see a warning; it&apos;s your own script).
-        <span className="mt-1.5 block rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-700 dark:text-amber-300">
+        <span className="mt-1.5 block rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-xs text-amber-700 dark:text-amber-300">
           ⚠️ <span className="font-semibold">Use a personal @gmail.com account</span>, not a Google
           Workspace one. If your final URL looks like{' '}
           <code className="bg-muted px-1 rounded">script.google.com/a/macros/yourcompany.com/…</code>,
@@ -83,7 +83,7 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
     title: 'Copy the web app URL into the field above',
     body: (
       <>
-        Copy the URL that ends in <code className="text-[11px] bg-muted px-1 py-0.5 rounded">/exec</code>,
+        Copy the URL that ends in <code className="text-xs bg-muted px-1 py-0.5 rounded">/exec</code>,
         paste it into the <span className="font-medium text-foreground">Google Sheet</span> field
         above, then hit <span className="font-medium text-foreground">Send test row</span> below.
         A “Test Lead” row should appear in your sheet within a few seconds. Don&apos;t forget to
@@ -132,12 +132,12 @@ export function ForwardTestButton({
         {label}
       </Button>
       {result?.ok && (
-        <span className="flex items-center gap-1 text-[11px] text-green-500 font-medium">
+        <span className="flex items-center gap-1 text-xs text-green-500 font-medium">
           <CheckCircle2 className="h-3.5 w-3.5" /> Sent!
         </span>
       )}
       {result && !result.ok && (
-        <span className="flex items-center gap-1 text-[11px] text-red-500 font-medium">
+        <span className="flex items-center gap-1 text-xs text-red-500 font-medium">
           <XCircle className="h-3.5 w-3.5 shrink-0" /> {result.error ?? 'Failed'}
         </span>
       )}
@@ -193,12 +193,12 @@ export function GoogleSheetGuide({
           <ol className="space-y-3">
             {STEPS.map((step, i) => (
               <li key={i} className="flex gap-2.5">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-[11px] font-bold shrink-0 mt-0.5">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 mt-0.5">
                   {i + 1}
                 </span>
                 <div className="min-w-0">
                   <p className="text-xs font-medium">{step.title}</p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5">{step.body}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{step.body}</p>
 
                   {/* The script block lives under step 3 */}
                   {i === 2 && (
@@ -235,16 +235,16 @@ export function GoogleSheetGuide({
               Send test row
             </Button>
             {!sheetUrl.trim() && (
-              <span className="text-[11px] text-muted-foreground">Paste your /exec URL above first.</span>
+              <span className="text-xs text-muted-foreground">Paste your /exec URL above first.</span>
             )}
             {testResult?.ok && (
-              <span className="flex items-center gap-1 text-[11px] text-green-500 font-medium">
+              <span className="flex items-center gap-1 text-xs text-green-500 font-medium">
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Row sent, check your sheet!
               </span>
             )}
             {testResult && !testResult.ok && (
-              <span className="flex items-start gap-1 text-[11px] text-red-500 font-medium">
+              <span className="flex items-start gap-1 text-xs text-red-500 font-medium">
                 <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                 <span>{testResult.error ?? 'Failed'}</span>
               </span>

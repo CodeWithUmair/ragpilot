@@ -1165,7 +1165,7 @@ function CustomizeTab({
           <div className="flex items-center justify-between gap-3 pt-1">
             <div>
               <p className="text-xs font-medium">Show &ldquo;Powered by&rdquo;</p>
-              <p className="text-[11px] text-muted-foreground">Pro hides this badge.</p>
+              <p className="text-xs text-muted-foreground">Pro hides this badge.</p>
             </div>
             <button
               type="button"
@@ -1219,7 +1219,7 @@ function CustomizeTab({
                   </div>
                   <div className="min-w-0">
                     <div className="font-medium text-xs">{p.label}</div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{p.description}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5 leading-tight">{p.description}</div>
                   </div>
                 </button>
               );

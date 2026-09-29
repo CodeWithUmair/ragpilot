@@ -137,7 +137,7 @@ export default function LeadsPage() {
                     <p className="text-xs text-muted-foreground truncate mt-0.5">
                       {lead.email || lead.phone || '—'}
                     </p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {formatDistanceToNow(new Date(lead.createdAt), { addSuffix: true })}
                     </p>
                   </div>
@@ -185,7 +185,7 @@ function LeadDetail({ lead, chatbotId }: { lead: Lead; chatbotId: string }) {
             {lead.priority !== 'COLD' && (
               <span
                 className={cn(
-                  'flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full',
+                  'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
                   PRIORITY_STYLES[lead.priority],
                 )}
                 title="How promising this lead looks, scored from the conversation (not owner-editable)"
@@ -196,7 +196,7 @@ function LeadDetail({ lead, chatbotId }: { lead: Lead; chatbotId: string }) {
             )}
             {lead.syncedAt && (
               <span
-                className="flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400 bg-green-500/10 px-2 py-1 rounded-full"
+                className="flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400 bg-green-500/10 px-2 py-1 rounded-full"
                 title={`Forwarded ${format(new Date(lead.syncedAt), "p '·' MMM d, yyyy")} (email / webhook / sheet)`}
               >
                 <Send className="h-3 w-3" />
