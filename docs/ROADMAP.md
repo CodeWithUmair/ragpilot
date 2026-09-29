@@ -5,7 +5,7 @@ Move items to `HANDOFF.md`'s session log when done.
 
 ## Now — go live
 - [ ] Deploy: Neon → DigitalOcean App Platform → Vercel (runbook in `HANDOFF.md`)
-- [ ] Live smoke test with a real OpenAI key (train a small site, chat, capture a lead)
+- [x] Live smoke test with a real OpenAI key (2026-09-28, local only — re-run once deployed)
 - [ ] Run the Playwright suites (`frontend/e2e`, `frontend/e2e-ui`) against the new backend
 - [ ] DNS for `rag.umairamir.com` (A record) and switch URLs / move to the single-VPS setup
 
