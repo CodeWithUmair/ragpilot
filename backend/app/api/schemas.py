@@ -1,11 +1,22 @@
 """Request/response models. Python stays snake_case; the wire format stays the
 camelCase the dashboard already consumes (alias_generator=to_camel)."""
 
+import json
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.alias_generators import to_camel
+
+# Trust-boundary caps for public, unauthenticated endpoints — these fields had
+# no length limit at all (a visitor could post an arbitrarily large question/
+# history/lead and pay for it downstream in embedding+chat tokens or DB rows).
+QUESTION_MAX = 4000
+NAME_MAX = 200
+EMAIL_MAX = 254  # RFC 5321
+PHONE_MAX = 50
+MESSAGE_MAX = 3000
+LEAD_FIELDS_MAX_BYTES = 5000
 
 
 class CamelModel(BaseModel):
@@ -131,18 +142,20 @@ class PublicChatbotOut(CamelModel):
 
 
 class ChatTurn(BaseModel):
-    question: str = ""
-    answer: str = ""
+    question: str = Field("", max_length=QUESTION_MAX)
+    answer: str = Field("", max_length=QUESTION_MAX)
 
 
 class ChatRequest(BaseModel):
-    question: str = ""
+    question: str = Field("", max_length=QUESTION_MAX)
     token: str | None = None
     url: str | None = None
     sessionId: str | None = None  # noqa: N815 — wire names
     visitorId: str | None = None  # noqa: N815
     hostPageUrl: str | None = None  # noqa: N815
-    history: list[ChatTurn] = Field(default_factory=list)
+    # The frontend only ever sends the last 5 turns (useChatStream.ts); 20 is
+    # generous headroom, not a real limit on normal use.
+    history: list[ChatTurn] = Field(default_factory=list, max_length=20)
 
 
 class ChatMessageOut(CamelModel):
@@ -192,13 +205,20 @@ class LeadCreate(BaseModel):
     token: str | None = None
     sessionId: str | None = None  # noqa: N815
     visitorId: str | None = None  # noqa: N815
-    name: str | None = None
-    email: str | None = None
-    phone: str | None = None
-    company: str | None = None
-    message: str | None = None
+    name: str | None = Field(None, max_length=NAME_MAX)
+    email: str | None = Field(None, max_length=EMAIL_MAX)
+    phone: str | None = Field(None, max_length=PHONE_MAX)
+    company: str | None = Field(None, max_length=NAME_MAX)
+    message: str | None = Field(None, max_length=MESSAGE_MAX)
     hostPageUrl: str | None = None  # noqa: N815
     fields: dict[str, Any] | None = None
+
+    @field_validator("fields")
+    @classmethod
+    def _fields_size_capped(cls, v: dict[str, Any] | None) -> dict[str, Any] | None:
+        if v is not None and len(json.dumps(v)) > LEAD_FIELDS_MAX_BYTES:
+            raise ValueError(f"fields is too large (max {LEAD_FIELDS_MAX_BYTES} bytes)")
+        return v
 
 
 class LeadStatusIn(BaseModel):

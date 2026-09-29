@@ -10,8 +10,8 @@ Move items to `HANDOFF.md`'s session log when done.
 - [ ] DNS for `rag.umairamir.com` (A record) and switch URLs / move to the single-VPS setup
 
 ## Next — production hardening
-- [ ] Per-IP rate limits on `/api/chat`, `/api/leads`, `/api/auth/sign-up/email` (e.g. a small
-      Postgres- or Redis-backed token bucket as a FastAPI dependency)
+- [x] Per-IP rate limits on `/api/chat`, `/api/leads`, `/api/auth/sign-up/email` (2026-09-29, D19 —
+      in-memory fixed-window counter, `lib/rate_limit.py`)
 - [ ] Monthly reset of `messageUsage` (period column or scheduled job) — "monthly" limit never resets today
 - [ ] Demo tenant: a public, pre-trained chatbot on the landing page so visitors can try it without signing up
 - [ ] LLM call log table (`llm_calls`: model, tokens in/out, latency, cost, error, node name) written from

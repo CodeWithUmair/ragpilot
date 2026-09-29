@@ -119,3 +119,22 @@ default (real logic for a problem a text hint mostly solves) and an
 LLM-generated per-session opener (a per-widget-open cost, including for
 visitors who bounce before typing). **Upgrade path:** revisit auto-generation
 only if owners' self-written openers are consistently weak in practice.
+
+### D19 — Rate limiting: in-memory fixed-window counter, not Redis (2026-09-29)
+**Why:** `/api/chat`, `/api/leads`, `/api/auth/sign-up/email` are public and
+unauthenticated — nothing stopped an anonymous caller from burning OpenAI
+credit or spamming signups before an owner even exists to be
+quota-limited by `messageUsage`. A hand-rolled `lib/rate_limit.py` dependency
+matches the project's existing style (SSRF guard, embed tokens are all
+small hand-rolled lib modules, not new dependencies) and needed no new
+infrastructure. **Rejected:** `slowapi`/Redis-backed limiting — real
+overkill for a single DigitalOcean App Platform instance, and a new
+dependency + a new infrastructure component (Redis) for a problem an
+in-process dict solves. Enforced in production only (same convention as the
+SSRF guard in `lib/net.py`) — otherwise the integration suite's many
+legitimate `signup()`/chat calls from one shared test-client IP would trip
+it immediately; the counting logic itself (`check()`) has no such gate and
+is unit-tested directly. **Ceiling, named explicitly:** state is
+per-process — resets on restart, doesn't share across horizontally-scaled
+instances. **Upgrade path:** a Postgres- or Redis-backed counter, only if
+this ever runs as more than one process.

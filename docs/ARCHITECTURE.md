@@ -175,6 +175,14 @@ Two policies chosen by path, reflecting the Origin (never `*`) with credentials:
 - Dev-only `/api/__test/*` endpoints 404 in production.
 - Production errors never leak exception text to the public widget.
 - Upload size cap 20 MB; nginx `client_max_body_size 25m`.
+- **Per-IP rate limiting** (`lib/rate_limit.py`) — an in-memory fixed-window
+  counter on `/api/chat` (20/min), `/api/leads` (10/min), and
+  `/api/auth/sign-up/email` (5/hour), keyed by `X-Forwarded-For` (falls back
+  to the socket IP). 429 `RATE_LIMITED` over the limit. Single-process by
+  design (see the file's own note) — the per-owner `messageUsage` quota
+  already caps an authenticated owner's usage; this stops anonymous abuse
+  before an owner even exists to be quota-limited. Enforced in production
+  only, same convention as the SSRF guard just above.
 
 ## 9. Email (`services/email.py`)
 

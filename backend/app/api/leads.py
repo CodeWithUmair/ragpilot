@@ -2,7 +2,7 @@ import csv
 import io
 import re
 
-from fastapi import APIRouter, BackgroundTasks, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, select
 
@@ -13,6 +13,7 @@ from app.core.errors import AppError
 from app.db.models import Chatbot, Lead, User
 from app.lib.embed_token import is_embed_token
 from app.lib.lead_config import PRIORITY_RANK
+from app.lib.rate_limit import rate_limit
 from app.services.leads import LeadOwner, clean, forward_lead, send_test_lead
 
 router = APIRouter(prefix="/api", tags=["leads"])
@@ -22,7 +23,7 @@ def lead_out(lead: Lead) -> dict:
     return LeadOut.model_validate(lead).model_dump(by_alias=True, mode="json")
 
 
-@router.post("/leads", status_code=201)
+@router.post("/leads", status_code=201, dependencies=[Depends(rate_limit("leads", 10, 60))])
 async def create_lead(body: LeadCreate, background: BackgroundTasks, db: DB):
     """Public: the widget's lead form."""
     if not is_embed_token(body.token):

@@ -88,16 +88,14 @@ Later, with DNS: either keep Vercel + DO and point `rag.umairamir.com` at Vercel
 
 ## Known gaps / tech debt (prioritised)
 
-1. **No rate limiting** on public endpoints (`/api/chat`, `/api/leads`, signup). Per-owner
-   message quota exists, but abuse could still burn OpenAI credit. Add per-IP limits.
-2. **"Monthly" message limit never resets** — `messageUsage` only resets via admin
+1. **"Monthly" message limit never resets** — `messageUsage` only resets via admin
    (inherited from the Express version). Needs a monthly reset job or period column.
-3. **Training runs inside the HTTP request** (SSE). Fine for ≤50 pages; a job queue
+2. **Training runs inside the HTTP request** (SSE). Fine for ≤50 pages; a job queue
    (Arq/Postgres jobs) would survive disconnects and redeploys.
-4. **Images/vision not ingested** (was disabled in the original too).
-5. CI shows GitHub "Node 20 deprecated" notices for actions — bump action versions eventually.
-6. `shadcn` is a runtime dependency in `frontend/package.json`; could move to devDependencies.
-7. Unused legacy tables `Verification`, `ShopifyStore` exist in the schema for parity.
+3. **Images/vision not ingested** (was disabled in the original too).
+4. CI shows GitHub "Node 20 deprecated" notices for actions — bump action versions eventually.
+5. `shadcn` is a runtime dependency in `frontend/package.json`; could move to devDependencies.
+6. Unused legacy tables `Verification`, `ShopifyStore` exist in the schema for parity.
 
 ## Next steps (suggested order)
 

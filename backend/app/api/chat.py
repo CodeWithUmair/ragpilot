@@ -5,7 +5,7 @@ import logging
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
@@ -19,6 +19,7 @@ from app.db.models import Chatbot, ChatMessage, ChatSession, User
 from app.db.session import SessionLocal
 from app.lib.embed_token import is_embed_token
 from app.lib.lead_config import resolve_lead_config
+from app.lib.rate_limit import rate_limit
 from app.lib.sse import SSE_HEADERS, SSE_MEDIA_TYPE, sse
 from app.rag.graph import ChatDeps, chat_graph
 from app.rag.providers import OpenAIChatModel, OpenAIEmbedder
@@ -62,8 +63,8 @@ async def _upsert_session(db, *, namespace, session_id, visitor_id, chatbot_id, 
     await db.commit()
 
 
-@router.get("/chat", operation_id="chat_get")
-@router.post("/chat", operation_id="chat_post")
+@router.get("/chat", operation_id="chat_get", dependencies=[Depends(rate_limit("chat", 20, 60))])
+@router.post("/chat", operation_id="chat_post", dependencies=[Depends(rate_limit("chat", 20, 60))])
 async def chat(request: Request):
     if request.method == "GET":
         body = ChatRequest.model_validate(dict(request.query_params))

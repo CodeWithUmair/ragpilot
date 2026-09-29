@@ -12,9 +12,9 @@ import secrets
 from urllib.parse import quote, urlencode
 
 import httpx
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse, RedirectResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from app.auth import service
@@ -23,11 +23,14 @@ from app.auth.security import read_verify_email_token, verify_password
 from app.core.config import get_settings
 from app.core.errors import AppError
 from app.db.models import Account, User
+from app.lib.rate_limit import rate_limit
 
 router = APIRouter(tags=["auth"])
 
 MIN_PASSWORD = 8
 MAX_PASSWORD = 128
+EMAIL_MAX = 254  # RFC 5321 — unauthenticated endpoints, so no length limit at all otherwise
+NAME_MAX = 200
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo"
@@ -35,20 +38,20 @@ OAUTH_STATE_COOKIE = "rp_oauth_state"
 
 
 class SignUpBody(BaseModel):
-    email: str
+    email: str = Field(max_length=EMAIL_MAX)
     password: str
-    name: str
+    name: str = Field(max_length=NAME_MAX)
     callbackURL: str | None = None  # noqa: N815 — wire field name
 
 
 class SignInBody(BaseModel):
-    email: str
+    email: str = Field(max_length=EMAIL_MAX)
     password: str
     callbackURL: str | None = None  # noqa: N815
 
 
 class ResendBody(BaseModel):
-    email: str
+    email: str = Field(max_length=EMAIL_MAX)
     callbackURL: str | None = None  # noqa: N815
 
 
@@ -66,7 +69,7 @@ def _check_email(email: str) -> str:
     return email
 
 
-@router.post("/api/auth/sign-up/email")
+@router.post("/api/auth/sign-up/email", dependencies=[Depends(rate_limit("sign-up", 5, 3600))])
 async def sign_up(body: SignUpBody, request: Request, db: DB):
     s = get_settings()
     email = _check_email(body.email)
