@@ -3,12 +3,8 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowRight, Github, Zap } from 'lucide-react';
+import { ArrowRight, Zap } from 'lucide-react';
 import { Button } from '../ui/button';
-
-const STACK = [
-  'FastAPI', 'LangGraph', 'Postgres + pgvector', 'Next.js 16', 'React 19', 'LangChain-free by design',
-];
 
 export function LandingFooter() {
   return (
@@ -33,25 +29,11 @@ export function LandingFooter() {
           </Button>
         </motion.div>
 
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground mb-10">
-          {STACK.map((s) => (
-            <span key={s} className="font-mono">{s}</span>
-          ))}
-        </div>
-
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2 font-semibold text-foreground">
             <Zap className="h-4 w-4 text-primary" /> RagPilot
           </div>
-          <a
-            href="https://github.com/CodeWithUmair/ragpilot"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 hover:text-foreground transition-colors"
-          >
-            <Github className="h-4 w-4" /> github.com/CodeWithUmair/ragpilot
-          </a>
-          <p>&copy; {new Date().getFullYear()} RagPilot. Built by Umair Amir.</p>
+          <p>&copy; {new Date().getFullYear()} RagPilot. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -34,7 +34,7 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
         <a href="https://sheets.new" target="_blank" rel="noreferrer" className="text-primary hover:underline inline-flex items-center gap-0.5">
           sheets.new <ExternalLink className="h-3 w-3" />
         </a>{' '}
-        and give the spreadsheet a name like <em>“Chatbot Leads”</em>. You can leave it empty — the
+        and give the spreadsheet a name like <em>“Chatbot Leads”</em>. You can leave it empty; the
         script adds a header row automatically.
       </>
     ),
@@ -67,12 +67,12 @@ const STEPS: { title: string; body: React.ReactNode }[] = [
         <span className="font-medium text-foreground">Execute as: Me</span> ·{' '}
         <span className="font-medium text-foreground">Who has access: Anyone</span>. Click{' '}
         <span className="font-medium text-foreground">Deploy</span> and authorize when Google asks
-        (Advanced → Go to project if you see a warning — it&apos;s your own script).
+        (Advanced → Go to project if you see a warning; it&apos;s your own script).
         <span className="mt-1.5 block rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-700 dark:text-amber-300">
           ⚠️ <span className="font-semibold">Use a personal @gmail.com account</span>, not a Google
           Workspace one. If your final URL looks like{' '}
           <code className="bg-muted px-1 rounded">script.google.com/a/macros/yourcompany.com/…</code>,
-          it&apos;s a Workspace deploy — Google locks it to your organization and our server gets a
+          it&apos;s a Workspace deploy: Google locks it to your organization and our server gets a
           401. A personal Gmail gives a public{' '}
           <code className="bg-muted px-1 rounded">script.google.com/macros/s/…/exec</code> URL.
         </span>
@@ -240,7 +240,7 @@ export function GoogleSheetGuide({
             {testResult?.ok && (
               <span className="flex items-center gap-1 text-[11px] text-green-500 font-medium">
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Row sent — check your sheet!
+                Row sent, check your sheet!
               </span>
             )}
             {testResult && !testResult.ok && (

@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowRight, ExternalLink, Github, Sparkles } from 'lucide-react';
+import { ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
 
 // Staged reveal of a real grounded answer — the actual "no hallucination,
@@ -64,7 +64,7 @@ function HeroChatCard() {
         {stage >= 3 && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
             <div className="rounded-2xl rounded-bl-sm bg-muted text-sm px-3 py-2 max-w-[90%]">
-              Yes — we build custom AI integrations and internal tooling. We don&apos;t offer blockchain
+              Yes, we build custom AI integrations and internal tooling. We don&apos;t offer blockchain
               or crypto services, if that&apos;s what you were comparing against.
             </div>
             <motion.a
@@ -99,7 +99,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 rounded-full px-3 py-1 mb-6"
           >
-            <Sparkles className="h-3.5 w-3.5" /> FastAPI + LangGraph, not a wrapper around a prompt
+            <Sparkles className="h-3.5 w-3.5" /> Built for real conversations, not a demo prompt
           </motion.div>
 
           <motion.h1
@@ -108,7 +108,7 @@ export function Hero() {
             transition={{ delay: 0.1 }}
             className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]"
           >
-            A chat widget that actually knows your site —{' '}
+            A chat widget that actually knows your site,{' '}
             <span className="text-primary">and admits when it doesn&apos;t.</span>
           </motion.h1>
 
@@ -119,7 +119,7 @@ export function Hero() {
             className="mt-6 text-lg text-muted-foreground max-w-lg"
           >
             Give RagPilot a URL. It crawls and indexes your site, then answers visitors with
-            grounded, cited replies — no invented prices, no pitching the wrong product, no
+            grounded, cited replies: no invented prices, no pitching the wrong product, no
             forgetting what they just asked. One script tag, live in minutes.
           </motion.p>
 
@@ -135,9 +135,7 @@ export function Hero() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="h-11 px-6 text-base">
-              <a href="https://github.com/CodeWithUmair/ragpilot" target="_blank" rel="noreferrer">
-                <Github className="h-4 w-4" /> View source
-              </a>
+              <a href="#how-it-works">See how it works</a>
             </Button>
           </motion.div>
         </div>

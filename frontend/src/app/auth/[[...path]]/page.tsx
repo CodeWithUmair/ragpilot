@@ -79,10 +79,10 @@ export default function AuthPage() {
         callbackURL: VERIFIED_CALLBACK(),
       });
       if (error) {
-        toast.error(error.message ?? 'Could not send the email — try again.');
+        toast.error(error.message ?? 'Could not send the email, try again.');
         return;
       }
-      toast.success('Verification email sent — check your inbox.');
+      toast.success('Verification email sent. Check your inbox.');
       setResendCooldown(30);
     } finally {
       setResending(false);

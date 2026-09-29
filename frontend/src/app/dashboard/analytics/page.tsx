@@ -311,7 +311,7 @@ export default function AnalyticsPage() {
                 </ChartCard>
                 <ChartCard title="Top pages where chats start">
                   {data.topPages.length === 0 ? (
-                    <EmptyNote>No page data yet — page URLs are recorded when the widget is embedded on your site.</EmptyNote>
+                    <EmptyNote>No page data yet. Page URLs are recorded when the widget is embedded on your site.</EmptyNote>
                   ) : (
                     <RankedList
                       items={data.topPages.map((p) => ({ label: p.page, count: p.count, mono: true }))}
@@ -476,7 +476,7 @@ function HourTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <TooltipFrame>
-      <p className="font-medium">{label}:00 — {label}:59 UTC</p>
+      <p className="font-medium">{label}:00-{label}:59 UTC</p>
       <p className="text-muted-foreground">
         Messages: <span className="font-semibold text-foreground">{payload[0].value}</span>
       </p>

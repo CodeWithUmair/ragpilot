@@ -198,7 +198,7 @@ async def forward_lead(lead_id: str, owner: LeadOwner) -> None:
         delivered: list[str] = []
         if config["notifyEmail"] and owner.owner_email:
             try:
-                subject = f"New lead from {owner.chatbot_name}" + (f" — {lead.name}" if lead.name else "")
+                subject = f"New lead from {owner.chatbot_name}" + (f": {lead.name}" if lead.name else "")
                 await send_email(owner.owner_email, subject, _lead_email_html(payload, owner.chatbot_name))
                 delivered.append("email")
             except Exception as exc:
@@ -276,14 +276,14 @@ async def send_test_lead(owner: LeadOwner, destination: str, url_override: str |
             "slack": config["slackWebhookUrl"], "discord": config["discordWebhookUrl"],
         }.get(destination, "")
         if not url:
-            return {"ok": False, "error": "No URL configured yet — paste your URL first"}
+            return {"ok": False, "error": "No URL configured yet, paste your URL first"}
         if not url.lower().startswith("https://"):
             return {"ok": False, "error": "URL must start with https://"}
         if domain := _workspace_domain(url):
             return {"ok": False, "error": (
                 f"This Apps Script is published under your Google Workspace ({domain}), which restricts it to "
                 f"people signed into {domain}. Our server can't reach it. Fix: create the Sheet + Apps Script with "
-                "a personal @gmail.com account and re-deploy — the URL will look like "
+                "a personal @gmail.com account and re-deploy. The URL will look like "
                 "script.google.com/macros/s/…/exec "
                 f"(no “/a/macros/{domain}/”). Alternatively, ask your Workspace admin to allow Apps Script web apps "
                 "to be shared with “Anyone”."
@@ -307,7 +307,7 @@ async def send_test_lead(owner: LeadOwner, destination: str, url_override: str |
         raw = str(exc) or "Request failed"
         if re.fullmatch(r"HTTP 40[13]", raw):
             return {"ok": False, "error": raw + (
-                " — the web app rejected an anonymous request. Re-deploy with “Who has access: Anyone” and a NEW "
-                "version. If your URL contains “/a/macros/…”, it’s a Workspace account — use a personal Gmail instead."
+                ": the web app rejected an anonymous request. Re-deploy with “Who has access: Anyone” and a NEW "
+                "version. If your URL contains “/a/macros/…”, it’s a Workspace account, use a personal Gmail instead."
             )}
         return {"ok": False, "error": raw}

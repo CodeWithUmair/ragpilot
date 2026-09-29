@@ -57,7 +57,7 @@ You are a helpful AI assistant. Your goal is to assist users with their inquirie
 
 ### Constraints
 1. Only answer using the provided context
-2. If you don't know, say so honestly — never make things up
+2. If you don't know, say so honestly. Never make things up
 3. Keep responses concise and clear
 4. Always end on a helpful note`,
   },
@@ -85,7 +85,7 @@ You are a sales assistant focused on understanding user needs and guiding them t
 1. Ask qualifying questions to understand the user's need
 2. Highlight benefits, not just features
 3. When user shows genuine interest, suggest booking a call
-4. Never be pushy — be consultative`,
+4. Never be pushy, be consultative`,
   },
   custom: {
     label: 'Custom Prompt',
@@ -373,7 +373,7 @@ function Step1Source({ state, update }: StepProps) {
                 </div>
                 <p className="font-medium text-sm">{state.file.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {(state.file.size / 1024).toFixed(1)} KB — Click to change
+                  {(state.file.size / 1024).toFixed(1)} KB, click to change
                 </p>
               </div>
             ) : (
@@ -382,7 +382,7 @@ function Step1Source({ state, update }: StepProps) {
                   <Upload className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <p className="text-sm font-medium">Drop file here or click to browse</p>
-                <p className="text-xs text-muted-foreground">PDF, DOCX, TXT, MD, CSV — up to 10MB</p>
+                <p className="text-xs text-muted-foreground">PDF, DOCX, TXT, MD, CSV, up to 10MB</p>
               </div>
             )}
           </button>
@@ -442,7 +442,7 @@ function Step2Appearance({ state, update }: StepProps) {
           className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <p className="text-xs text-muted-foreground">
-          A question gets visitors qualifying themselves from message one — beats a
+          A question gets visitors qualifying themselves from message one, which beats a
           plain hello.
         </p>
       </div>
@@ -579,7 +579,7 @@ function Step3Personality({ state, update }: StepProps) {
             {state.personalityType === 'custom' ? 'Your instructions' : 'System prompt preview'}
           </label>
           {state.personalityType !== 'custom' && (
-            <span className="text-xs text-muted-foreground">Read-only — edit via Custom</span>
+            <span className="text-xs text-muted-foreground">Read-only, edit via Custom</span>
           )}
         </div>
         <textarea

@@ -41,14 +41,14 @@ const PERSONALITIES: Record<PersonalityKey, {
     tagline: 'Warm, helpful, fixes problems',
     icon: Headphones,
     systemPrompt:
-      "You are a warm and friendly customer support assistant. Keep replies concise — usually 1-2 short sentences. Be conversational, never robotic. Use only the provided context. If you don't know, say so honestly and offer to connect them to a human.",
+      "You are a warm and friendly customer support assistant. Keep replies concise: usually 1-2 short sentences. Be conversational, never robotic. Use only the provided context. If you don't know, say so honestly and offer to connect them to a human.",
   },
   sales: {
     label: 'Sales & Lead Capture',
     tagline: 'Engages visitors, asks qualifying questions',
     icon: ShoppingBag,
     systemPrompt:
-      "You are an enthusiastic sales assistant. Your job is to help visitors and gently capture leads. Keep replies short and conversational — never paragraphs. Ask one qualifying question at a time when relevant. Never be pushy. Use only the provided context.",
+      "You are an enthusiastic sales assistant. Your job is to help visitors and gently capture leads. Keep replies short and conversational, never paragraphs. Ask one qualifying question at a time when relevant. Never be pushy. Use only the provided context.",
   },
   docs: {
     label: 'Technical Docs',
@@ -62,7 +62,7 @@ const PERSONALITIES: Record<PersonalityKey, {
     tagline: 'Balanced, neutral, answers anything',
     icon: MessageCircle,
     systemPrompt:
-      "You are a helpful assistant. Keep replies concise and on-point — short sentences, not paragraphs. Answer only from the provided context. Be honest when you don't know.",
+      "You are a helpful assistant. Keep replies concise and on-point: short sentences, not paragraphs. Answer only from the provided context. Be honest when you don't know.",
   },
 };
 
@@ -278,7 +278,7 @@ export default function OnboardingPage() {
               onClick={next}
               disabled={!canAdvance() || submitting}
             >
-              {step === 'review' ? 'Looks good — create my bot' : 'Continue'}
+              {step === 'review' ? 'Looks good, create my bot' : 'Continue'}
               <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -341,7 +341,7 @@ function WelcomeStep() {
       </h1>
       <p className="text-muted-foreground mt-3 max-w-md mx-auto">
         In the next 60 seconds we&apos;ll create a chatbot tailored to your
-        site. You can change anything later — nothing here is permanent.
+        site. You can change anything later, nothing here is permanent.
       </p>
       <div className="grid grid-cols-3 gap-3 mt-10 max-w-md mx-auto">
         {[
@@ -506,12 +506,12 @@ function AppearanceStep({
           <textarea
             value={data.welcomeMessage}
             onChange={(e) => patch({ welcomeMessage: e.target.value })}
-            placeholder="Hi! I'm here to help — what brings you in today?"
+            placeholder="Hi! I'm here to help, what brings you in today?"
             rows={3}
             className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
           />
           <p className="text-xs text-muted-foreground mt-1.5">
-            Ask a question instead of just saying hello — it gets visitors qualifying
+            Ask a question instead of just saying hello. It gets visitors qualifying
             themselves from message one (e.g. &ldquo;What are you looking for today?&rdquo;
             beats &ldquo;How can I help?&rdquo;).
           </p>
@@ -563,7 +563,7 @@ function FeaturesStep({
     <div>
       <StepHeading
         title="Pick the features you want"
-        subtitle="Free includes the essentials. Pro unlocks everything as a bundle — no à la carte."
+        subtitle="Free includes the essentials. Pro unlocks everything as a bundle, no à la carte."
       />
 
       <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium mb-2.5">
@@ -645,7 +645,7 @@ function FreeUserProCard({
           </div>
           <div>
             <p className="font-semibold text-sm">Everything in Pro</p>
-            <p className="text-xs text-muted-foreground">$29 / month — unlocks the bundle below</p>
+            <p className="text-xs text-muted-foreground">$29 / month, unlocks the bundle below</p>
           </div>
         </div>
 
@@ -655,7 +655,7 @@ function FreeUserProCard({
               <Check className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400 mt-0.5 shrink-0" />
               <div>
                 <span className="font-medium">{perk.label}</span>
-                <span className="text-muted-foreground"> — {perk.description}</span>
+                <span className="text-muted-foreground">: {perk.description}</span>
               </div>
             </li>
           ))}
@@ -673,7 +673,7 @@ function FreeUserProCard({
           {interested ? (
             <>
               <Check className="h-4 w-4" />
-              Interested in Pro — we&apos;ll remind you at the end
+              Interested in Pro, we&apos;ll remind you at the end
             </>
           ) : (
             <>
@@ -766,7 +766,7 @@ function ReviewStep({
                   You&apos;re interested in Pro
                 </p>
                 <p className="text-xs text-violet-800 dark:text-violet-200 mt-0.5">
-                  Finish onboarding on Free — your bot will work right away. We&apos;ll
+                  Finish onboarding on Free. Your bot will work right away, and we&apos;ll
                   show the upgrade banner on the dashboard so you can switch anytime.
                 </p>
               </div>
@@ -825,7 +825,7 @@ function ReviewStep({
       <p className="text-xs text-muted-foreground mt-4">
         {userOnFreePlan
           ? <>You&apos;ll be created on the <strong>Free</strong> plan. An admin can upgrade you to Pro from the admin panel during this preview.</>
-          : <>You&apos;re already on <strong>Pro</strong> — all features are unlocked.</>}
+          : <>You&apos;re already on <strong>Pro</strong>, all features are unlocked.</>}
       </p>
     </div>
   );

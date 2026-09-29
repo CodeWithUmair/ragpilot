@@ -17,17 +17,17 @@ export function LiveDemo({ demoAvailable }: { demoAvailable: boolean }) {
             <MessageCircleQuestion className="h-5 w-5" />
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            This isn&apos;t a mockup — it&apos;s the real widget.
+            This isn&apos;t a mockup. It&apos;s the real widget.
           </h2>
           {demoAvailable ? (
             <p className="mt-4 text-muted-foreground text-lg">
               The chat bubble in the bottom-right corner is a live, rate-limited RagPilot instance
-              trained on this project&apos;s own docs. Ask it something — it&apos;ll cite where the
+              trained on our own docs. Ask it something and it&apos;ll cite where the
               answer came from, same as it would on your site.
             </p>
           ) : (
             <p className="mt-4 text-muted-foreground text-lg">
-              The public demo bot is being trained right now — in the meantime, sign up and point
+              The public demo bot is being trained right now. In the meantime, sign up and point
               RagPilot at your own site to see the same thing on your own content.
             </p>
           )}

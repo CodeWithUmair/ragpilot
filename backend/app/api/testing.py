@@ -74,7 +74,7 @@ async def seed_conversation(db: DB, email: str = Body(None, embed=True)):
     user = await _user(db, email)
     await _wipe_namespace(db, CONVERSATION_NS)
     question = "Does the conversation history load correctly?"
-    answer = "Yes — this seeded reply proves the /chat/history endpoint and its CORS headers work end to end."
+    answer = "Yes, this seeded reply proves the /chat/history endpoint and its CORS headers work end to end."
     bot = Chatbot(name="E2E Conversations Bot", url="https://e2e.conversations.test", embed_token=CONVERSATION_NS,
                   user_id=user.id, is_trained=True)
     db.add(bot)

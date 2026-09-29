@@ -390,7 +390,7 @@ function TrainTab({
           <textarea
             value={rawText}
             onChange={(e) => setRawText(e.target.value)}
-            placeholder="Paste any text content here — FAQs, documentation, product descriptions..."
+            placeholder="Paste any text content here: FAQs, documentation, product descriptions..."
             rows={8}
             className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
           />
@@ -606,7 +606,7 @@ function ScrapeProgressPanel({
         <div className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
           <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0" />
           <span>
-            Training in progress — keep this tab open. Reloading or closing it
+            Training in progress: keep this tab open. Reloading or closing it
             will stop training and the bot won&apos;t be marked as trained.
           </span>
         </div>
@@ -706,8 +706,8 @@ const PERSONALITY_OPTIONS: Array<{
     description: 'Warm, helpful, fixes problems',
     icon: Headphones,
     systemPrompt:
-      "You are a warm and friendly customer support assistant. Keep replies concise — usually 1-2 short sentences. Be conversational, never robotic. Use only the provided context. If you don't know, say so honestly and offer to connect them to a human.",
-    sampleReply: "Hey! Thanks for reaching out — I'd be happy to help. Could you tell me a bit more about what you're seeing?",
+      "You are a warm and friendly customer support assistant. Keep replies concise: usually 1-2 short sentences. Be conversational, never robotic. Use only the provided context. If you don't know, say so honestly and offer to connect them to a human.",
+    sampleReply: "Hey! Thanks for reaching out, I'd be happy to help. Could you tell me a bit more about what you're seeing?",
   },
   {
     key: 'sales',
@@ -715,8 +715,8 @@ const PERSONALITY_OPTIONS: Array<{
     description: 'Engages visitors, asks qualifying questions',
     icon: ShoppingBag,
     systemPrompt:
-      "You are an enthusiastic sales assistant. Your job is to help visitors and gently capture leads. Keep replies short and conversational — never paragraphs. Ask one qualifying question at a time when relevant. Never be pushy. Use only the provided context.",
-    sampleReply: "Great question! To point you to the right plan — is this for a personal project or a team?",
+      "You are an enthusiastic sales assistant. Your job is to help visitors and gently capture leads. Keep replies short and conversational, never paragraphs. Ask one qualifying question at a time when relevant. Never be pushy. Use only the provided context.",
+    sampleReply: "Great question! To point you to the right plan, is this for a personal project or a team?",
   },
   {
     key: 'docs',
@@ -733,8 +733,8 @@ const PERSONALITY_OPTIONS: Array<{
     description: 'Balanced, neutral, answers anything',
     icon: MessageCircle,
     systemPrompt:
-      "You are a helpful assistant. Keep replies concise and on-point — short sentences, not paragraphs. Answer only from the provided context. Be honest when you don't know.",
-    sampleReply: "Sure — that's covered on our pricing page. The basic plan is free; paid plans start at $29/month.",
+      "You are a helpful assistant. Keep replies concise and on-point: short sentences, not paragraphs. Answer only from the provided context. Be honest when you don't know.",
+    sampleReply: "Sure, that's covered on our pricing page. The basic plan is free; paid plans start at $29/month.",
   },
 ];
 
@@ -887,7 +887,7 @@ function CustomizeTab({
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
             />
             <p className="text-xs text-muted-foreground mt-1.5">
-              Ask a question instead of a plain hello — it gets visitors qualifying
+              Ask a question instead of a plain hello. It gets visitors qualifying
               themselves from message one.
             </p>
           </div>
@@ -999,7 +999,7 @@ function CustomizeTab({
                 <p className="text-xs font-medium text-muted-foreground">Forward new leads to (optional)</p>
                 <div>
                   <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Webhook URL — Zapier, Make, n8n, or any CRM endpoint
+                    Webhook URL: Zapier, Make, n8n, or any CRM endpoint
                   </label>
                   <div className="flex items-center gap-2">
                     <input
@@ -1019,7 +1019,7 @@ function CustomizeTab({
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Google Sheet — Apps Script web-app URL
+                    Google Sheet: Apps Script web-app URL
                   </label>
                   <input
                     type="url"
@@ -1035,7 +1035,7 @@ function CustomizeTab({
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Slack — Incoming Webhook URL
+                    Slack: Incoming Webhook URL
                   </label>
                   <div className="flex items-center gap-2">
                     <input
@@ -1051,7 +1051,7 @@ function CustomizeTab({
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Discord — Webhook URL
+                    Discord: Webhook URL
                   </label>
                   <div className="flex items-center gap-2">
                     <input
@@ -1067,7 +1067,7 @@ function CustomizeTab({
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Telegram — Bot token + Chat ID
+                    Telegram: Bot token + Chat ID
                   </label>
                   <div className="flex items-center gap-2">
                     <input
@@ -1089,7 +1089,7 @@ function CustomizeTab({
                     <ForwardTestButton chatbotId={chatbotId} destination="telegram" label="Test" />
                   </div>
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    Save your settings first — the test message uses what&apos;s saved, not what&apos;s typed above.
+                    Save your settings first. The test message uses what&apos;s saved, not what&apos;s typed above.
                   </p>
                 </div>
               </div>

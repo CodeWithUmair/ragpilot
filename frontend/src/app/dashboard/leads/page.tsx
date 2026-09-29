@@ -188,7 +188,7 @@ function LeadDetail({ lead, chatbotId }: { lead: Lead; chatbotId: string }) {
                   'flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full',
                   PRIORITY_STYLES[lead.priority],
                 )}
-                title="How promising this lead looks, scored from the conversation — not owner-editable"
+                title="How promising this lead looks, scored from the conversation (not owner-editable)"
               >
                 {lead.priority === 'HOT' && <Flame className="h-3 w-3" />}
                 {lead.priority}

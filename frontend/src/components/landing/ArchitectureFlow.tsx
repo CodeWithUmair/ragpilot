@@ -9,37 +9,37 @@ const STEPS = [
   {
     icon: Globe,
     title: 'You give it a URL',
-    blurb: 'Crawl + discover',
+    blurb: 'We read your whole site',
     detail:
-      'RagPilot crawls the sitemap and does a same-origin BFS pass, skipping /checkout, /login and the like, then groups pages into categories you pick from.',
+      'We crawl your site, skipping things like checkout and login pages, then group what we find into categories you choose from.',
   },
   {
     icon: Scissors,
-    title: 'Pages become chunks',
-    blurb: 'Chrome stripped, deduped',
+    title: 'Pages become clean knowledge',
+    blurb: 'Noise removed first',
     detail:
-      'Nav, footers and cookie banners get stripped before anything is embedded — that boilerplate was the #1 cause of hallucinated answers (see below).',
+      'Navigation, footers and cookie banners get stripped before anything is learned. That boilerplate was the single biggest cause of made-up answers.',
   },
   {
     icon: Database,
-    title: 'Chunks become vectors',
-    blurb: 'pgvector, HNSW index',
+    title: 'Your content, kept private',
+    blurb: 'One account, one namespace',
     detail:
-      'Each chunk is embedded and stored in Postgres + pgvector, namespaced per chatbot — one tenant can never search another tenant\'s data.',
+      'What we learn from your site is kept separate from every other account. Your data is never searchable by anyone else\'s chatbot.',
   },
   {
     icon: Bot,
     title: 'A visitor asks something',
-    blurb: 'LangGraph agent decides',
+    blurb: 'It decides how to respond',
     detail:
-      'A graph — not a straight-line pipeline — routes small talk away from retrieval, retries a weak follow-up with a rewritten query, and only then generates.',
+      'Small talk gets a quick reply. A vague follow-up gets clarified against the conversation so far before searching again. Only then does it answer.',
   },
   {
     icon: MessageCircle,
     title: 'A grounded, cited answer',
-    blurb: 'Streamed to the widget',
+    blurb: 'Streamed live to the widget',
     detail:
-      'The answer streams token-by-token, only from what was actually retrieved — with the source page linked, not invented.',
+      'The answer streams in as it\'s written, built only from what was actually found on your site, with the source page linked, never invented.',
   },
 ];
 

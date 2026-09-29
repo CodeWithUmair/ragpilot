@@ -33,6 +33,7 @@ from langgraph.graph import END, START, StateGraph
 from app.lib.contact_extract import ExtractedContact, extract_contact, has_contact_handle
 from app.lib.lead_config import detect_lead_intent, score_lead_priority
 from app.rag import retrieval
+from app.rag.dash_filter import DashFilter
 from app.rag.prompts import REWRITE_SYSTEM, build_system_prompt, history_messages
 from app.rag.providers import ChatModel, Embedder
 from app.rag.vector_store import Match, VectorStore
@@ -161,9 +162,16 @@ async def generate(state: ChatState, config: RunnableConfig) -> dict:
         {"role": "user", "content": state["question"]},
     ]
     answer = ""
+    dashes = DashFilter()
     async for delta in deps.llm.stream(messages, temperature=0.2, max_tokens=1500):
-        answer += delta
-        write({"event": "delta", "data": {"content": delta}})
+        clean = dashes.feed(delta)
+        if clean:
+            answer += clean
+            write({"event": "delta", "data": {"content": clean}})
+    tail = dashes.flush()
+    if tail:
+        answer += tail
+        write({"event": "delta", "data": {"content": tail}})
     return {"answer": answer, "sources": sources}
 
 

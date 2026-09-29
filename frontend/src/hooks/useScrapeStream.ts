@@ -196,7 +196,7 @@ export function useScrapeStream(): UseScrapeStreamResult {
               setProgress((p) => ({
                 ...p,
                 phase: 'done',
-                message: `Indexed ${data.pagesIndexed} pages — ${data.recordsStored} chunks stored.`,
+                message: `Indexed ${data.pagesIndexed} pages, ${data.recordsStored} chunks stored.`,
                 recordsStored: data.recordsStored,
                 currentUrl: null,
               }));
@@ -246,7 +246,7 @@ export function useScrapeStream(): UseScrapeStreamResult {
             // Connected. Move off "Connecting…" unless an event already did.
             bumpWatchdog();
             setProgress((p) =>
-              p.message === 'Connecting…' ? { ...p, message: 'Connected — preparing pages…' } : p,
+              p.message === 'Connecting…' ? { ...p, message: 'Connected, preparing pages…' } : p,
             );
 
             const reader = res.body.getReader();
@@ -285,7 +285,7 @@ export function useScrapeStream(): UseScrapeStreamResult {
               setProgress((p) => ({
                 ...p,
                 phase: 'error',
-                error: 'Training connection closed before finishing. Some pages may have been saved — please retry.',
+                error: 'Training connection closed before finishing. Some pages may have been saved, please retry.',
               }));
               finish({ success: false, error: 'Connection closed before completion' });
             }

@@ -149,7 +149,7 @@ function ChatHistory({ session }: { session: any }) {
             <p className="text-sm font-medium">No messages recorded</p>
             <p className="text-xs mt-1 leading-relaxed">
               This session was started but the visitor never sent a full
-              message — usually because they closed the chat before the bot
+              message, usually because they closed the chat before the bot
               finished responding, or the chat errored out.
             </p>
           </div>
