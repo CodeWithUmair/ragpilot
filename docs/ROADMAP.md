@@ -13,7 +13,10 @@ Move items to `HANDOFF.md`'s session log when done.
 - [x] Per-IP rate limits on `/api/chat`, `/api/leads`, `/api/auth/sign-up/email` (2026-09-29, D19 —
       in-memory fixed-window counter, `lib/rate_limit.py`)
 - [ ] Monthly reset of `messageUsage` (period column or scheduled job) — "monthly" limit never resets today
-- [ ] Demo tenant: a public, pre-trained chatbot on the landing page so visitors can try it without signing up
+- [ ] Demo tenant: a public, pre-trained chatbot on the landing page so visitors can try it without signing up.
+      The landing page itself is built (2026-09-29) and already wired to show it — just set
+      `NEXT_PUBLIC_DEMO_CHATBOT_TOKEN` once a real chatbot is created and trained (protected by the
+      per-IP rate limiting already in place)
 - [ ] LLM call log table (`llm_calls`: model, tokens in/out, latency, cost, error, node name) written from
       `providers.py`; a dashboard card showing cost per 100 answers
 
