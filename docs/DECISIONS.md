@@ -138,3 +138,25 @@ is unit-tested directly. **Ceiling, named explicitly:** state is
 per-process — resets on restart, doesn't share across horizontally-scaled
 instances. **Upgrade path:** a Postgres- or Redis-backed counter, only if
 this ever runs as more than one process.
+
+### D20 — Deployed the API to a shared droplet via pm2, not DigitalOcean App Platform (2026-09-29)
+**Why:** Umair already had a DigitalOcean droplet (`backend-iamdivinity`) running
+two other of his projects via pm2, with real headroom to spare (2.8GB available
+RAM, 97GB free disk against divinfi/pinflow's combined ~430MB usage). Deploying
+RagPilot's backend there as a fourth pm2 process cost nothing extra and shipped
+immediately, versus spinning up a new paid App Platform instance for a
+portfolio-stage project with no real traffic yet. Verified the process is
+properly isolated at the network level before treating it as acceptable: port
+4000 is firewalled from direct external access (confirmed live — only reachable
+through nginx's 80/443), and nginx explicitly forwards `X-Forwarded-For` so the
+per-IP rate limiter still sees real visitor IPs, not the shared droplet's own IP,
+through the proxy. **Rejected:** App Platform now — real cost for a service with
+no traffic yet, when the spec (`.do/app.yaml`) already exists and can be used the
+moment it's actually justified. **Explicit ceiling:** this is a shared box —
+RagPilot's traffic, a crash, or a training-run spike could compete for resources
+with Umair's other live projects on the same droplet, even though separate pm2
+processes isolate a crash from taking down the others. **Upgrade path, stated by
+Umair himself:** move to dedicated infrastructure (Railway mentioned) once real
+traffic justifies it — see `docs/HANDOFF.md` Known gaps. Don't over-invest in
+droplet-specific tooling (systemd units, droplet-specific CI, etc.) assuming this
+is permanent.

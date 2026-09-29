@@ -4,10 +4,13 @@ Ordered by value for the project's purpose (a live, defensible portfolio product
 Move items to `HANDOFF.md`'s session log when done.
 
 ## Now — go live
-- [ ] Deploy: Neon → DigitalOcean App Platform → Vercel (runbook in `HANDOFF.md`)
-- [x] Live smoke test with a real OpenAI key (2026-09-28, local only — re-run once deployed)
-- [ ] Run the Playwright suites (`frontend/e2e`, `frontend/e2e-ui`) against the new backend
-- [ ] DNS for `rag.umairamir.com` (A record) and switch URLs / move to the single-VPS setup
+- [x] Deploy (2026-09-29, D20) — **NOT** the App Platform runbook originally planned here;
+      Neon → a shared DigitalOcean droplet via pm2 → Vercel instead, budget-conscious, move to
+      dedicated infra later. Full details in `docs/HANDOFF.md` ("How it's actually deployed")
+- [x] Live smoke test with a real OpenAI key (2026-09-28 local, 2026-09-29 in production —
+      real signup, Google OAuth login, chat all verified live)
+- [ ] Run the Playwright suites (`frontend/e2e`, `frontend/e2e-ui`) against the now-live production backend
+- [x] DNS for `rag.umairamir.com` and `rag-api.umairamir.com` (2026-09-29, GoDaddy A/CNAME records, SSL live on both)
 
 ## Next — production hardening
 - [x] Per-IP rate limits on `/api/chat`, `/api/leads`, `/api/auth/sign-up/email` (2026-09-29, D19 —

@@ -23,10 +23,14 @@ are quoted from the code — if you change one, update it here.
 - **Widget** (visitor): `public/chatbot-embed.js` injects an iframe of `/embed?token=…`
   which renders `components/chat/ChatWidget.tsx` (Fin-style: Home / Messages / chat).
   The widget calls only public endpoints.
-- **Production topologies:** (a) Vercel frontend + DigitalOcean App Platform API + Neon
-  DB (current plan, cross-origin, bearer tokens), or (b) one VPS: docker-compose
-  (db, api, web) behind nginx on `rag.umairamir.com` (same origin). Both work because
-  auth never relies on cookies.
+- **Production topologies:** (a) Vercel frontend + DigitalOcean App Platform API +
+  Neon DB (originally planned, cross-origin, bearer tokens), (b) one dedicated VPS:
+  docker-compose (db, api, web) behind nginx on `rag.umairamir.com` (same origin),
+  or (c) **what's actually live as of 2026-09-29**: Vercel frontend +
+  Neon DB + the API as a pm2 process on an existing *shared* DigitalOcean droplet
+  behind nginx, cross-origin (`rag.umairamir.com` ↔ `rag-api.umairamir.com`) —
+  see `docs/DECISIONS.md` D20 and `docs/HANDOFF.md` for the actual deploy details.
+  All work because auth never relies on cookies.
 
 ## 2. Data model (`backend/app/db/models.py`)
 
