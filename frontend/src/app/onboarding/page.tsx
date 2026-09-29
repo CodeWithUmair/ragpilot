@@ -357,7 +357,7 @@ function WelcomeStep() {
             className="rounded-xl border border-border bg-card p-3 text-center"
           >
             <item.icon className="h-4 w-4 text-primary mx-auto mb-1.5" />
-            <p className="text-[11px] text-muted-foreground leading-tight">{item.label}</p>
+            <p className="text-xs text-muted-foreground leading-tight">{item.label}</p>
           </motion.div>
         ))}
       </div>
