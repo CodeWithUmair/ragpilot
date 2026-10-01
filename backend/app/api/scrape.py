@@ -27,6 +27,7 @@ from app.ingest.extract import (
     url_category,
 )
 from app.ingest.files import UnsupportedFile, extract_text
+from app.lib.plans import get_plan
 from app.lib.sse import SSE_HEADERS, SSE_MEDIA_TYPE, sse
 from app.lib.text_clean import collapse_ws
 from app.rag.providers import OpenAIEmbedder
@@ -53,18 +54,19 @@ async def scrape(request: Request, user: CurrentUser, db: DB, url: str, categori
         raise AppError("No chatbot found for this URL. Create the chatbot first.", 404)
 
     selected_categories, selected_urls = _csv(categories), _csv(urls)
+    max_pages = get_plan(user.plan)["pageLimit"]
     if not selected_categories:
-        return await _discover(url, namespace)
+        return await _discover(url, namespace, max_pages)
     return StreamingResponse(
-        _index_stream(request, url, namespace, selected_categories, selected_urls),
+        _index_stream(request, url, namespace, selected_categories, selected_urls, max_pages),
         media_type=SSE_MEDIA_TYPE, headers=SSE_HEADERS,
     )
 
 
-async def _discover(url: str, namespace: str) -> dict:
+async def _discover(url: str, namespace: str, max_pages: int) -> dict:
     t0 = time.perf_counter()
-    sitemap, crawled = await crawler.discover(url)
-    unique = list(dict.fromkeys([*sitemap, *crawled]))
+    sitemap, crawled = await crawler.discover(url, max_pages)
+    unique = list(dict.fromkeys([*sitemap, *crawled]))[:max_pages]
     by_category: dict[str, list[str]] = {}
     for page in unique:
         by_category.setdefault(url_category(page), []).append(page)
@@ -78,18 +80,19 @@ async def _discover(url: str, namespace: str) -> dict:
     }
 
 
-async def _index_stream(request: Request, base_url: str, namespace: str, categories: list[str], urls: list[str]):
+async def _index_stream(request: Request, base_url: str, namespace: str, categories: list[str], urls: list[str],
+                        max_pages: int):
     # First event immediately, so the UI leaves "Connecting…" and its silence
     # watchdog sees a heartbeat.
     yield sse("phase", {"phase": "crawling", "message": "Preparing pages…"})
 
     if urls:  # the dashboard already discovered pages; skip the expensive re-crawl
-        targets, total_discovered = urls, len(urls)
+        targets, total_discovered = urls[:max_pages], len(urls)  # server-side cap: the client's list is untrusted
     else:
         yield sse("phase", {"phase": "crawling", "message": "Crawling site..."})
-        sitemap, crawled = await crawler.discover(base_url)
+        sitemap, crawled = await crawler.discover(base_url, max_pages)
         everything = list(dict.fromkeys([*sitemap, *crawled]))
-        targets = [u for u in everything if url_category(u) in categories]
+        targets = [u for u in everything if url_category(u) in categories][:max_pages]
         total_discovered = len(everything)
     yield sse("crawl-done", {"totalPages": len(targets), "totalDiscovered": total_discovered})
 

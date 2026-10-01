@@ -33,6 +33,7 @@ def test_get_plan_resolves_legacy_key():
 def test_plan_limits_and_features():
     assert (PLANS["free"]["chatbotLimit"], PLANS["free"]["messageLimit"]) == (1, 100)
     assert (PLANS["pro"]["chatbotLimit"], PLANS["pro"]["messageLimit"], PLANS["pro"]["price"]) == (3, 2000, 29)
+    assert (PLANS["free"]["pageLimit"], PLANS["pro"]["pageLimit"]) == (50, 300)
     assert PLANS["free"]["features"]["leadCapture"] is False
     assert all(PLANS["pro"]["features"].values())
     assert set(PLANS["free"]["features"]) == set(PLANS["pro"]["features"])

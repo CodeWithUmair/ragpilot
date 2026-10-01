@@ -14,7 +14,6 @@ from bs4 import BeautifulSoup
 
 from app.lib.net import safe_client
 
-MAX_PAGES = 50
 CONCURRENCY = 5
 MAX_SITEMAP_DEPTH = 2
 EXCLUDE_PATTERNS = ("/checkout", "/cart", "/login", "/signup", "/account", "/admin", "/wp-admin", "/search")
@@ -73,7 +72,7 @@ async def fetch_sitemap_urls(client: httpx.AsyncClient, url: str, depth: int = 0
     return locs
 
 
-async def crawl_site(client: httpx.AsyncClient, base_url: str) -> list[str]:
+async def crawl_site(client: httpx.AsyncClient, base_url: str, max_pages: int) -> list[str]:
     robots = await fetch_robots(client, base_url)
     origin = _origin(base_url)
     visited: set[str] = set()
@@ -87,9 +86,9 @@ async def crawl_site(client: httpx.AsyncClient, base_url: str) -> list[str]:
         except httpx.HTTPError:
             return None
 
-    while frontier and len(discovered) < MAX_PAGES:
+    while frontier and len(discovered) < max_pages:
         batch: list[str] = []
-        while frontier and len(batch) < CONCURRENCY and len(discovered) + len(batch) < MAX_PAGES:
+        while frontier and len(batch) < CONCURRENCY and len(discovered) + len(batch) < max_pages:
             url = frontier.pop(0)
             if url in visited:
                 continue
@@ -114,10 +113,10 @@ async def crawl_site(client: httpx.AsyncClient, base_url: str) -> list[str]:
                 if canonical and canonical not in visited:
                     frontier.append(canonical)
 
-    return discovered[:MAX_PAGES]
+    return discovered[:max_pages]
 
 
-async def discover(base_url: str) -> tuple[list[str], list[str]]:
+async def discover(base_url: str, max_pages: int) -> tuple[list[str], list[str]]:
     """Returns (sitemap_urls, crawled_urls)."""
     async with http_client() as client:
         try:  # the post-redirect URL is the site's canonical origin (apex vs www)
@@ -127,6 +126,6 @@ async def discover(base_url: str) -> tuple[list[str], list[str]]:
         origin = _origin(base_url)
         sitemap, crawled = await asyncio.gather(
             fetch_sitemap_urls(client, f"{origin}/sitemap.xml"),
-            crawl_site(client, base_url),
+            crawl_site(client, base_url, max_pages),
         )
     return [c for u in sitemap if (c := to_canonical(u, origin))], crawled

@@ -10,11 +10,14 @@ PLANS: dict[str, dict[str, Any]] = {
         "price": 0,
         "messageLimit": 100,
         "chatbotLimit": 1,
+        "pageLimit": 50,
         "features": {
             "crawl": True, "fileUpload": True, "leadCapture": False,
             "googleSheets": False, "proactiveCta": False, "removeBranding": False,
         },
-        "featureList": ["1 chatbot", "100 messages / month", "Website crawler", "File upload (PDF, DOCX, TXT, CSV)"],
+        "featureList": [
+            "1 chatbot", "100 messages / month", "Website crawler (50 pages)", "File upload (PDF, DOCX, TXT, CSV)",
+        ],
         "description": "Try it out. Best for testing or small personal sites.",
     },
     "pro": {
@@ -23,12 +26,13 @@ PLANS: dict[str, dict[str, Any]] = {
         "price": 29,
         "messageLimit": 2000,
         "chatbotLimit": 3,
+        "pageLimit": 300,
         "features": {
             "crawl": True, "fileUpload": True, "leadCapture": True,
             "googleSheets": True, "proactiveCta": True, "removeBranding": True,
         },
         "featureList": [
-            "3 chatbots", "2,000 messages / month", "Lead capture → Google Sheets",
+            "3 chatbots", "2,000 messages / month", "Website crawler (300 pages)", "Lead capture → Google Sheets",
             "Proactive CTA bubble", 'Remove "Powered by" branding', "Conversation analytics",
         ],
         "description": "For real businesses capturing leads on their site.",
