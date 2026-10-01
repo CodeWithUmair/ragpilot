@@ -309,8 +309,8 @@ export function useSaveCategories(id: string) {
       lastTrainedAt?: string;
     }) => api.post(`/chatbots/${id}/categories`, data),
     onSuccess: () => {
+      // No toast: this runs as a step of training, which shows its own "Trained!" one.
       queryClient.invalidateQueries({ queryKey: queryKeys.chatbot(id) });
-      toast.success('Categories saved');
     },
   });
 }
