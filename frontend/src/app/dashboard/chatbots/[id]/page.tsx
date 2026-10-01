@@ -1426,6 +1426,7 @@ function SettingsTab({ chatbotId, chatbot }: { chatbotId: string; chatbot: any }
   });
   const [saving, setSaving] = useState(false);
   const resetMutation = useResetKnowledge(chatbotId);
+  const queryClient = useQueryClient();
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -1433,6 +1434,9 @@ function SettingsTab({ chatbotId, chatbot }: { chatbotId: string; chatbot: any }
     try {
       const { api } = await import('../../../../lib/api');
       await api.patch(`/chatbots/${chatbotId}`, form);
+      // Refetch: the other tabs seed their forms from this cached chatbot, so a
+      // stale copy would show old values (and overwrite this save on their next one).
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatbot(chatbotId) });
       toast.success('Settings saved');
     } catch {
       toast.error('Failed to save');
