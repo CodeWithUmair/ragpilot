@@ -9,7 +9,7 @@ from app.core.errors import AppError
 from app.db.models import Chatbot, ChatbotCategory
 from app.lib.embed_token import generate_embed_token
 from app.lib.lead_config import public_lead_config
-from app.lib.plans import get_plan
+from app.lib.plans import plan_for
 from app.rag.vector_store import PgVectorStore
 
 router = APIRouter(prefix="/api", tags=["chatbots"])
@@ -56,7 +56,7 @@ async def create_chatbot(body: ChatbotCreate, user: CurrentUser, db: DB):
         await db.commit()
         return {"chatbot": out(bot), "embedToken": bot.embed_token}
 
-    plan = get_plan(user.plan)
+    plan = await plan_for(db, user.plan)
     count = await db.scalar(select(func.count()).select_from(Chatbot).where(Chatbot.user_id == user.id))
     if count >= plan["chatbotLimit"]:
         limit = plan["chatbotLimit"]

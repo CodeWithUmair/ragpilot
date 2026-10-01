@@ -2,17 +2,62 @@
 
 import { useState } from 'react';
 import { Search, RotateCcw, Shield } from 'lucide-react';
-import { useAdminUsers, useSetUserPlan, useResetUserUsage, useMe } from '@/hooks/useApi';
+import {
+  useAdminUsers, useSetUserPlan, useResetUserUsage, useMe, useAdminPlans, useSetPlanLimits, type PlanLimits,
+} from '@/hooks/useApi';
 import { PLAN_LIST, PLANS, type PlanKey } from '@/lib/plans';
 import { cn } from '@/lib/utils';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 
+const LIMIT_FIELDS: { key: keyof PlanLimits; label: string }[] = [
+  { key: 'messageLimit', label: 'Messages / month' },
+  { key: 'chatbotLimit', label: 'Chatbots' },
+  { key: 'pageLimit', label: 'Crawl pages' },
+];
+
+function PlanLimitsForm({ plan, label, current }: { plan: PlanKey; label: string; current: PlanLimits }) {
+  const save = useSetPlanLimits();
+  // Only the typed-over fields live here; everything else reads from the server value.
+  const [draft, setDraft] = useState<Partial<Record<keyof PlanLimits, string>>>({});
+  const value = (k: keyof PlanLimits) => draft[k] ?? String(current[k]);
+  const limits = Object.fromEntries(LIMIT_FIELDS.map(({ key }) => [key, Number(value(key))])) as unknown as PlanLimits;
+  const valid = Object.values(limits).every((n) => Number.isInteger(n) && n >= 1);
+  const dirty = LIMIT_FIELDS.some(({ key }) => limits[key] !== current[key]);
+
+  return (
+    <div className="rounded-xl border border-border p-4 space-y-3">
+      <div className="font-medium">{label}</div>
+      {LIMIT_FIELDS.map(({ key, label: fieldLabel }) => (
+        <label key={key} className="flex items-center justify-between gap-3 text-sm">
+          <span className="text-muted-foreground">{fieldLabel}</span>
+          <input
+            type="number"
+            min={1}
+            value={value(key)}
+            onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
+            className="w-28 rounded-lg border border-input bg-background px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </label>
+      ))}
+      <Button
+        size="sm"
+        disabled={!dirty || !valid}
+        loading={save.isPending}
+        onClick={() => save.mutate({ plan, limits }, { onSuccess: () => setDraft({}) })}
+      >
+        Save {label} limits
+      </Button>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { data: me, isLoading: meLoading } = useMe();
   const [search, setSearch] = useState('');
   const { data, isLoading } = useAdminUsers(search);
+  const { data: plans } = useAdminPlans();
   const setPlan = useSetUserPlan();
   const resetUsage = useResetUserUsage();
 
@@ -48,6 +93,22 @@ export default function AdminPage() {
           Manage user subscriptions and usage. Changes take effect immediately.
         </p>
       </div>
+
+      {plans && (
+        <section className="space-y-3">
+          <div>
+            <h2 className="text-lg font-semibold">Plan limits</h2>
+            <p className="text-xs text-muted-foreground">
+              Applies to every user on the plan, immediately. The pricing cards show the built-in defaults.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {PLAN_LIST.map((p) => (
+              <PlanLimitsForm key={p.key} plan={p.key} label={p.label} current={plans[p.key]} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

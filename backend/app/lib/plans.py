@@ -3,6 +3,10 @@ Keys are camelCase because the dict is returned to the dashboard as-is."""
 
 from typing import Any
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.models import PlanLimit
+
 PLANS: dict[str, dict[str, Any]] = {
     "free": {
         "key": "free",
@@ -51,3 +55,14 @@ def normalize_plan_key(plan: str | None) -> str:
 
 def get_plan(plan: str | None) -> dict[str, Any]:
     return PLANS[normalize_plan_key(plan)]
+
+
+async def plan_for(db: AsyncSession, plan: str | None) -> dict[str, Any]:
+    """The plan with any admin-edited limits applied. Every limit check goes
+    through this (not get_plan) so an admin change takes effect immediately."""
+    base = get_plan(plan)
+    row = await db.get(PlanLimit, base["key"])
+    if not row:
+        return base
+    return {**base, "messageLimit": row.message_limit, "chatbotLimit": row.chatbot_limit,
+            "pageLimit": row.page_limit}

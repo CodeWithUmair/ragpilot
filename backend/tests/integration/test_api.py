@@ -159,6 +159,13 @@ async def test_chatbot_crud_and_plan_limit(client):
     assert "webhookUrl" not in public["leadConfig"]
 
 
+async def test_admin_plan_routes_reject_non_admin(client):
+    h = (await signup(client))["headers"]
+    assert (await client.get("/api/admin/plans", headers=h)).status_code == 403
+    body = {"messageLimit": 1, "chatbotLimit": 1, "pageLimit": 1}
+    assert (await client.put("/api/admin/plans/free/limits", json=body, headers=h)).status_code == 403
+
+
 async def test_tenant_isolation(client):
     alice, bob = await signup(client, "Alice"), await signup(client, "Bob")
     bot = (await client.post("/api/chatbots", json={"url": "https://alice.test"}, headers=alice["headers"])).json()

@@ -10,7 +10,7 @@ from app.auth.service import resolve_session
 from app.core.config import get_settings
 from app.core.errors import AppError
 from app.db.session import get_db
-from app.lib.plans import get_plan, normalize_plan_key
+from app.lib.plans import normalize_plan_key, plan_for
 
 
 @dataclass
@@ -37,7 +37,7 @@ async def current_user(request: Request, db: DB) -> AppUser:
     # TEST_PRO_EMAILS accounts are pinned to Pro; everyone's limit is kept in
     # step with their plan, so a plan edit can't leave a stale limit behind.
     plan = "pro" if s.is_test_pro_email(user.email) else normalize_plan_key(user.plan)
-    limit = get_plan(plan)["messageLimit"]
+    limit = (await plan_for(db, plan))["messageLimit"]
     if user.plan != plan or user.message_limit != limit:
         user.plan, user.message_limit = plan, limit
         await db.commit()

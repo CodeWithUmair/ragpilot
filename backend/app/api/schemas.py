@@ -253,3 +253,10 @@ class NameIn(BaseModel):
 
 class PlanIn(BaseModel):
     plan: str
+
+
+class PlanLimitsIn(RequestModel):
+    # Upper bounds are sanity checks against a typo, not product limits.
+    message_limit: int = Field(ge=1, le=1_000_000)
+    chatbot_limit: int = Field(ge=1, le=1_000)
+    page_limit: int = Field(ge=1, le=5_000)

@@ -96,6 +96,18 @@ class User(Base):
     chatbots: Mapped[list["Chatbot"]] = relationship(back_populates="user", passive_deletes=True)
 
 
+class PlanLimit(Base):
+    """Admin-edited limits for a plan; a missing row means the defaults in lib/plans.py."""
+
+    __tablename__ = "PlanLimit"
+
+    plan: Mapped[str] = mapped_column(String, primary_key=True)
+    message_limit: Mapped[int] = mapped_column("messageLimit", Integer)
+    chatbot_limit: Mapped[int] = mapped_column("chatbotLimit", Integer)
+    page_limit: Mapped[int] = mapped_column("pageLimit", Integer)
+    updated_at: Mapped[datetime] = updated_col()
+
+
 class Session(Base):
     __tablename__ = "Session"
 

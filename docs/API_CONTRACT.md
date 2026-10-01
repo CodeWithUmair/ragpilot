@@ -75,6 +75,8 @@ Frames are `event: X\ndata: <single-line JSON>\n\n`.
 | GET `/api/admin/users?search&page&limit` | admin only: `{users: [{…, createdAt, chatbotCount}], total, page, limit}` |
 | PATCH `/api/admin/users/{id}/plan` `{plan}` | admin |
 | POST `/api/admin/users/{id}/reset-usage` | admin |
+| GET `/api/admin/plans` | admin: `{plans: {free, pro}}` with admin-edited limits applied (`messageLimit`, `chatbotLimit`, `pageLimit`) |
+| PUT `/api/admin/plans/{plan}/limits` `{messageLimit, chatbotLimit, pageLimit}` | admin: all three required ints ≥ 1; applies to every user on the plan at once. Stored in `"PlanLimit"` (no row = defaults in `lib/plans.py`) |
 
 `Chatbot` = `{id, name, url, embedToken, status, isTrained, lastTrainedAt, systemPrompt, personalityType, welcomeMessage, themeColor, userId, widgetTheme, widgetWidth, widgetHeight, logoUrl, primaryColor, headerColor, botAvatar, inputPlaceholder, showPoweredBy, leadConfig, createdAt, updatedAt, categories: [{id, chatbotId, name, pages, enabled, indexed}]}`
 

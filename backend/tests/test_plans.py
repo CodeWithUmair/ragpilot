@@ -1,8 +1,10 @@
 """app.lib.plans — spec: dl-chat-rag/backend/src/lib/plans.ts."""
 
+from types import SimpleNamespace
+
 import pytest
 
-from app.lib.plans import PLANS, get_plan, normalize_plan_key
+from app.lib.plans import PLANS, get_plan, normalize_plan_key, plan_for
 
 
 @pytest.mark.parametrize(
@@ -39,3 +41,19 @@ def test_plan_limits_and_features():
     assert set(PLANS["free"]["features"]) == set(PLANS["pro"]["features"])
     for key, plan in PLANS.items():
         assert plan["key"] == key
+
+
+class _FakeDB:
+    def __init__(self, row):
+        self.row = row
+
+    async def get(self, model, key):
+        return self.row
+
+
+async def test_plan_for_applies_admin_limits():
+    row = SimpleNamespace(message_limit=5, chatbot_limit=6, page_limit=7)
+    plan = await plan_for(_FakeDB(row), "pro")
+    assert (plan["messageLimit"], plan["chatbotLimit"], plan["pageLimit"]) == (5, 6, 7)
+    assert plan["label"] == "Pro"  # everything else still comes from the defaults
+    assert await plan_for(_FakeDB(None), "pro") is PLANS["pro"]

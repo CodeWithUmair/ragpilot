@@ -162,6 +162,7 @@ export const queryKeys = {
   chatHistory: (sessionId: string) => ['chat-history', sessionId] as const,
   leads: (chatbotId: string) => ['leads', chatbotId] as const,
   adminUsers: (search: string) => ['admin', 'users', search] as const,
+  adminPlans: ['admin', 'plans'] as const,
   analytics: (f: AnalyticsFilters) => ['analytics', f.chatbotId, f.from ?? '', f.to ?? ''] as const,
 };
 
@@ -480,6 +481,39 @@ export function useAdminUsers(search = '') {
     queryFn: async (): Promise<{ users: AdminUser[]; total: number }> => {
       const { data } = await api.get('/admin/users', { params: { search } });
       return data;
+    },
+  });
+}
+
+export interface PlanLimits {
+  messageLimit: number;
+  chatbotLimit: number;
+  pageLimit: number;
+}
+
+export function useAdminPlans() {
+  return useQuery({
+    queryKey: queryKeys.adminPlans,
+    queryFn: async (): Promise<Record<'free' | 'pro', PlanLimits & { label: string }>> => {
+      const { data } = await api.get('/admin/plans');
+      return data.plans;
+    },
+  });
+}
+
+export function useSetPlanLimits() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ plan, limits }: { plan: 'free' | 'pro'; limits: PlanLimits }) =>
+      api.put(`/admin/plans/${plan}/limits`, limits),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminPlans });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.me });
+      toast.success('Plan limits updated');
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message ?? err.response?.data?.error ?? 'Failed to update limits');
     },
   });
 }

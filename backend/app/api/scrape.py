@@ -27,7 +27,7 @@ from app.ingest.extract import (
     url_category,
 )
 from app.ingest.files import UnsupportedFile, extract_text
-from app.lib.plans import get_plan
+from app.lib.plans import plan_for
 from app.lib.sse import SSE_HEADERS, SSE_MEDIA_TYPE, sse
 from app.lib.text_clean import collapse_ws
 from app.rag.providers import OpenAIEmbedder
@@ -54,7 +54,7 @@ async def scrape(request: Request, user: CurrentUser, db: DB, url: str, categori
         raise AppError("No chatbot found for this URL. Create the chatbot first.", 404)
 
     selected_categories, selected_urls = _csv(categories), _csv(urls)
-    max_pages = get_plan(user.plan)["pageLimit"]
+    max_pages = (await plan_for(db, user.plan))["pageLimit"]
     if not selected_categories:
         return await _discover(url, namespace, max_pages)
     return StreamingResponse(
