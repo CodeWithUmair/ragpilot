@@ -39,6 +39,16 @@ def _origin(url: str) -> str:
     return f"{p.scheme}://{p.netloc}"
 
 
+def to_canonical(url: str, origin: str) -> str | None:
+    """Rewrite www/apex (and http/https) variants of the site onto its canonical
+    origin; None for other hosts. Without this, a sitemap listing the apex and
+    pages linking to www.* were indexed as two copies of every page."""
+    p, o = urlparse(url), urlparse(origin)
+    if p.netloc.lower().removeprefix("www.") != o.netloc.lower().removeprefix("www."):
+        return None
+    return normalize_url(p._replace(scheme=o.scheme, netloc=o.netloc).geturl())
+
+
 async def fetch_robots(client: httpx.AsyncClient, base_url: str) -> RobotFileParser | None:
     try:
         res = await client.get(f"{base_url.rstrip('/')}/robots.txt")
@@ -97,12 +107,12 @@ async def crawl_site(client: httpx.AsyncClient, base_url: str) -> list[str]:
             discovered.append(url)
             for a in BeautifulSoup(html, "lxml").find_all("a", href=True):
                 try:
-                    absolute = normalize_url(urljoin(url, str(a["href"])))
+                    absolute = urljoin(url, str(a["href"]))
                 except ValueError:
                     continue
-                same_site = absolute.startswith(("http://", "https://")) and _origin(absolute) == origin
-                if same_site and absolute not in visited:
-                    frontier.append(absolute)
+                canonical = absolute.startswith(("http://", "https://")) and to_canonical(absolute, origin)
+                if canonical and canonical not in visited:
+                    frontier.append(canonical)
 
     return discovered[:MAX_PAGES]
 
@@ -110,8 +120,13 @@ async def crawl_site(client: httpx.AsyncClient, base_url: str) -> list[str]:
 async def discover(base_url: str) -> tuple[list[str], list[str]]:
     """Returns (sitemap_urls, crawled_urls)."""
     async with http_client() as client:
+        try:  # the post-redirect URL is the site's canonical origin (apex vs www)
+            base_url = str((await client.get(base_url)).url)
+        except httpx.HTTPError:
+            pass
+        origin = _origin(base_url)
         sitemap, crawled = await asyncio.gather(
-            fetch_sitemap_urls(client, f"{base_url.rstrip('/')}/sitemap.xml"),
+            fetch_sitemap_urls(client, f"{origin}/sitemap.xml"),
             crawl_site(client, base_url),
         )
-    return sitemap, crawled
+    return [c for u in sitemap if (c := to_canonical(u, origin))], crawled
