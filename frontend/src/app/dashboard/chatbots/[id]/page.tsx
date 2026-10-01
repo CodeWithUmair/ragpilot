@@ -3,6 +3,7 @@
 
 import { use, useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft, Bot, Code, RefreshCw, Globe,
   CheckCircle2, Clock, Zap, FileText, Type, XCircle, X,
@@ -13,6 +14,7 @@ import Link from 'next/link';
 import {
   useChatbot,
   useMe,
+  queryKeys,
   useSaveCategories,
   useResetKnowledge,
   useDiscoverCategories,
@@ -105,7 +107,7 @@ export default function ChatbotDetailPage({
       </div>
 
       {tab === 'train' && <TrainTab chatbotId={id} chatbot={chatbot} onTrained={() => setTab('customize')} />}
-      {tab === 'customize' && <CustomizeTab chatbotId={id} chatbot={chatbot} />}
+      {tab === 'customize' && <CustomizeTab chatbotId={id} chatbot={chatbot} onSaved={() => setTab('embed')} />}
       {tab === 'embed' && <EmbedTab chatbot={chatbot} />}
       {tab === 'settings' && <SettingsTab chatbotId={id} chatbot={chatbot} />}
     </div>
@@ -752,9 +754,11 @@ const THEME_COLORS = [
 function CustomizeTab({
   chatbotId,
   chatbot,
+  onSaved,
 }: {
   chatbotId: string;
   chatbot: any;
+  onSaved: () => void;
 }) {
   const [form, setForm] = useState({
     welcomeMessage: chatbot.welcomeMessage ?? 'Hi! How can I help you today?',
@@ -770,6 +774,7 @@ function CustomizeTab({
   });
   const [saving, setSaving] = useState(false);
   const { data: me } = useMe();
+  const queryClient = useQueryClient();
   // Hiding the badge is Pro-only (the API enforces it too); free users see it locked on.
   const canRemoveBranding = planAllows(me?.plan ?? 'free', 'removeBranding');
   const showBadge = canRemoveBranding ? form.showPoweredBy : true;
@@ -863,6 +868,10 @@ function CustomizeTab({
         leadConfig: { ...leadConfig, required, trigger: 'intent' },
       });
       toast.success('Customizations saved');
+      // Refetch so coming back to this tab shows what was just saved, then hand
+      // off to Embed (the next step: put the widget on the site).
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatbot(chatbotId) });
+      onSaved();
     } catch {
       toast.error('Failed to save');
     } finally {
