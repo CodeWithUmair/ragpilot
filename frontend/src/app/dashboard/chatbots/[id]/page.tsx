@@ -29,7 +29,8 @@ import { planAllows } from '../../../../lib/plans';
 import { StatusBadge } from '../../../../components/ui/StatusBadge';
 import { Button } from '../../../../components/ui/button';
 import { ColorPicker } from '../../../../components/ui/color-picker';
-import { GoogleSheetGuide, ForwardTestButton } from '../../../../components/dashboard/GoogleSheetGuide';
+import { LeadCaptureDialog, type LeadConfigState } from '../../../../components/dashboard/LeadCaptureDialog';
+import { InfoTip } from '../../../../components/ui/InfoTip';
 import toast from 'react-hot-toast';
 
 type Tab = 'train' | 'customize' | 'embed' | 'settings';
@@ -778,11 +779,13 @@ function CustomizeTab({
   // Hiding the badge is Pro-only (the API enforces it too); free users see it locked on.
   const canRemoveBranding = planAllows(me?.plan ?? 'free', 'removeBranding');
   const showBadge = canRemoveBranding ? form.showPoweredBy : true;
+  const canCaptureLeads = planAllows(me?.plan ?? 'free', 'leadCapture');
+  const [leadOpen, setLeadOpen] = useState(false);
 
   // Lead capture config (stored as a JSON blob on the chatbot). `required` is
   // derived on save (a contact method is always required).
   const LEAD_FIELDS: LeadField[] = ['name', 'email', 'phone', 'company'];
-  const [leadConfig, setLeadConfig] = useState({
+  const [leadConfig, setLeadConfig] = useState<LeadConfigState>({
     enabled: chatbot.leadConfig?.enabled ?? DEFAULT_LEAD_CONFIG.enabled,
     fields: (chatbot.leadConfig?.fields?.length
       ? chatbot.leadConfig.fields
@@ -797,6 +800,7 @@ function CustomizeTab({
     telegramBotToken: chatbot.leadConfig?.telegramBotToken ?? '',
     telegramChatId: chatbot.leadConfig?.telegramChatId ?? '',
   });
+  const showLeads = canCaptureLeads && leadConfig.enabled;
 
   // ── Resizable split: drag the divider to widen the controls panel so the
   //    preview can shrink (and vice-versa). Clamped between MIN/MAX. Only
@@ -851,7 +855,8 @@ function CustomizeTab({
     setForm((f) => ({ ...f, personalityType: key, systemPrompt: p.systemPrompt }));
   }
 
-  async function handleSave() {
+  // Returns whether it saved. `goToEmbed` is off when saving from inside the lead-form modal.
+  async function handleSave(goToEmbed = true): Promise<boolean> {
     setSaving(true);
     try {
       const { api } = await import('../../../../lib/api');
@@ -865,15 +870,17 @@ function CustomizeTab({
       await api.patch(`/chatbots/${chatbotId}`, {
         ...form,
         themeColor: form.primaryColor,
-        leadConfig: { ...leadConfig, required, trigger: 'intent' },
+        leadConfig: { ...leadConfig, enabled: showLeads, required, trigger: 'intent' },
       });
       toast.success('Customizations saved');
       // Refetch so coming back to this tab shows what was just saved, then hand
       // off to Embed (the next step: put the widget on the site).
       queryClient.invalidateQueries({ queryKey: queryKeys.chatbot(chatbotId) });
-      onSaved();
+      if (goToEmbed) onSaved();
+      return true;
     } catch {
       toast.error('Failed to save');
+      return false;
     } finally {
       setSaving(false);
     }
@@ -893,7 +900,12 @@ function CustomizeTab({
             <h3 className="font-medium text-sm">Greeting</h3>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5 text-muted-foreground">Welcome message</label>
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Welcome message</label>
+              <InfoTip>
+                Ask a question instead of a plain hello. It gets visitors qualifying themselves from message one.
+              </InfoTip>
+            </div>
             <input
               value={form.welcomeMessage}
               onChange={(e) => setForm({ ...form, welcomeMessage: e.target.value })}
@@ -901,10 +913,6 @@ function CustomizeTab({
               placeholder="What are you looking for today?"
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
             />
-            <p className="text-xs text-muted-foreground mt-1.5">
-              Ask a question instead of a plain hello. It gets visitors qualifying
-              themselves from message one.
-            </p>
           </div>
           <div>
             <label className="block text-xs font-medium mb-1.5 text-muted-foreground">Input placeholder</label>
@@ -923,194 +931,57 @@ function CustomizeTab({
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-primary" />
               <h3 className="font-medium text-sm">Lead capture</h3>
+              <InfoTip>
+                When a visitor shows interest (pricing, contact, getting started&hellip;), the chat asks for
+                their details. New leads appear under Leads.
+              </InfoTip>
             </div>
             <button
               type="button"
-              onClick={() => setLeadConfig((c) => ({ ...c, enabled: !c.enabled }))}
-              aria-pressed={leadConfig.enabled}
+              role="switch"
+              aria-checked={showLeads}
+              onClick={() => {
+                const turningOn = !leadConfig.enabled;
+                setLeadConfig((c) => ({ ...c, enabled: turningOn }));
+                if (turningOn) setLeadOpen(true);
+              }}
+              disabled={saving || !canCaptureLeads}
               className={cn(
-                'relative h-5 w-9 rounded-full transition-colors shrink-0',
-                leadConfig.enabled ? 'bg-primary' : 'bg-muted',
+                'relative h-5 w-9 rounded-full transition-colors shrink-0 disabled:cursor-not-allowed disabled:opacity-50',
+                showLeads ? 'bg-primary' : 'bg-muted',
               )}
             >
               <span
                 className={cn(
                   'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all',
-                  leadConfig.enabled ? 'right-0.5' : 'left-0.5',
+                  showLeads ? 'right-0.5' : 'left-0.5',
                 )}
               />
             </button>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            When a visitor shows interest (pricing, getting started, contact…), the chat shows a
-            form to collect their details. New leads appear under{' '}
-            <span className="font-medium text-foreground">Leads</span>.
-          </p>
-
-          {leadConfig.enabled && (
-            <div className="space-y-3 pt-1">
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-muted-foreground">Fields to collect</label>
-                <div className="flex flex-wrap gap-2">
-                  {LEAD_FIELDS.map((f) => {
-                    const on = leadConfig.fields.includes(f);
-                    return (
-                      <button
-                        key={f}
-                        type="button"
-                        onClick={() =>
-                          setLeadConfig((c) => ({
-                            ...c,
-                            fields: on ? c.fields.filter((x) => x !== f) : [...c.fields, f],
-                          }))
-                        }
-                        className={cn(
-                          'text-xs font-medium px-3 py-1.5 rounded-full border capitalize transition-colors',
-                          on
-                            ? 'bg-primary/10 text-primary border-transparent'
-                            : 'border-border text-muted-foreground hover:bg-accent',
-                        )}
-                      >
-                        {f}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-muted-foreground">Form heading</label>
-                <input
-                  value={leadConfig.heading}
-                  onChange={(e) => setLeadConfig((c) => ({ ...c, heading: e.target.value }))}
-                  disabled={saving}
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1.5 text-muted-foreground">Thank-you message</label>
-                <input
-                  value={leadConfig.successMessage}
-                  onChange={(e) => setLeadConfig((c) => ({ ...c, successMessage: e.target.value }))}
-                  disabled={saving}
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={leadConfig.notifyEmail}
-                    onChange={(e) => setLeadConfig((c) => ({ ...c, notifyEmail: e.target.checked }))}
-                  />
-                  Email me each new lead
-                </label>
-                {leadConfig.notifyEmail && (
-                  <ForwardTestButton chatbotId={chatbotId} destination="email" label="Send test email" />
-                )}
-              </div>
-
-              {/* Forwarding destinations (webhook + Google Sheet) */}
-              <div className="pt-3 border-t border-border space-y-3">
-                <p className="text-xs font-medium text-muted-foreground">Forward new leads to (optional)</p>
-                <div>
-                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Webhook URL: Zapier, Make, n8n, or any CRM endpoint
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="url"
-                      placeholder="https://hooks.zapier.com/..."
-                      value={leadConfig.webhookUrl}
-                      onChange={(e) => setLeadConfig((c) => ({ ...c, webhookUrl: e.target.value }))}
-                      disabled={saving}
-                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                    />
-                    <ForwardTestButton
-                      chatbotId={chatbotId}
-                      destination="webhook"
-                      url={leadConfig.webhookUrl}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Google Sheet: Apps Script web-app URL
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://script.google.com/macros/s/.../exec"
-                    value={leadConfig.sheetUrl}
-                    onChange={(e) => setLeadConfig((c) => ({ ...c, sheetUrl: e.target.value }))}
-                    disabled={saving}
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                  />
-                  <div className="mt-2">
-                    <GoogleSheetGuide chatbotId={chatbotId} sheetUrl={leadConfig.sheetUrl} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Slack: Incoming Webhook URL
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="url"
-                      placeholder="https://hooks.slack.com/services/..."
-                      value={leadConfig.slackWebhookUrl}
-                      onChange={(e) => setLeadConfig((c) => ({ ...c, slackWebhookUrl: e.target.value }))}
-                      disabled={saving}
-                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                    />
-                    <ForwardTestButton chatbotId={chatbotId} destination="slack" url={leadConfig.slackWebhookUrl} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Discord: Webhook URL
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="url"
-                      placeholder="https://discord.com/api/webhooks/..."
-                      value={leadConfig.discordWebhookUrl}
-                      onChange={(e) => setLeadConfig((c) => ({ ...c, discordWebhookUrl: e.target.value }))}
-                      disabled={saving}
-                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                    />
-                    <ForwardTestButton chatbotId={chatbotId} destination="discord" url={leadConfig.discordWebhookUrl} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
-                    Telegram: Bot token + Chat ID
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="Bot token"
-                      value={leadConfig.telegramBotToken}
-                      onChange={(e) => setLeadConfig((c) => ({ ...c, telegramBotToken: e.target.value }))}
-                      disabled={saving}
-                      className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Chat ID"
-                      value={leadConfig.telegramChatId}
-                      onChange={(e) => setLeadConfig((c) => ({ ...c, telegramChatId: e.target.value }))}
-                      disabled={saving}
-                      className="w-28 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed"
-                    />
-                    <ForwardTestButton chatbotId={chatbotId} destination="telegram" label="Test" />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1.5">
-                    Save your settings first. The test message uses what&apos;s saved, not what&apos;s typed above.
-                  </p>
-                </div>
-              </div>
-            </div>
+          {!canCaptureLeads && (
+            <p className="text-xs text-muted-foreground">
+              <Link href="/dashboard/settings" className="text-primary hover:underline">Upgrade to Pro</Link>{' '}
+              to collect leads.
+            </p>
+          )}
+          {showLeads && (
+            <Button type="button" variant="outline" size="sm" onClick={() => setLeadOpen(true)}>
+              Edit lead form
+            </Button>
           )}
         </section>
+        <LeadCaptureDialog
+          open={leadOpen}
+          onOpenChange={setLeadOpen}
+          chatbotId={chatbotId}
+          config={leadConfig}
+          setConfig={setLeadConfig}
+          saving={saving}
+          onSave={async () => {
+            if (await handleSave(false)) setLeadOpen(false);
+          }}
+        />
 
         {/* Color */}
         <section className="rounded-xl border border-border bg-card p-4 space-y-3">
@@ -1217,6 +1088,10 @@ function CustomizeTab({
           <div className="flex items-center gap-2">
             <MessageCircle className="h-4 w-4 text-primary" />
             <h3 className="font-medium text-sm">Tone</h3>
+            <InfoTip>
+              How your bot talks. Picking one rewrites the System prompt (Settings tab), which is what
+              actually steers the bot.
+            </InfoTip>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {PERSONALITY_OPTIONS.map((p) => {
@@ -1252,7 +1127,7 @@ function CustomizeTab({
         </section>
 
         <Button
-          onClick={handleSave}
+          onClick={() => handleSave()}
           size="md"
           loading={saving}
           className="w-full"

@@ -66,3 +66,8 @@ async def plan_for(db: AsyncSession, plan: str | None) -> dict[str, Any]:
         return base
     return {**base, "messageLimit": row.message_limit, "chatbotLimit": row.chatbot_limit,
             "pageLimit": row.page_limit}
+
+
+async def feature_allowed(db: AsyncSession, plan: str | None, feature: str) -> bool:
+    """The one gate for plan-restricted features (keys of PLANS[...]["features"])."""
+    return (await plan_for(db, plan))["features"][feature]

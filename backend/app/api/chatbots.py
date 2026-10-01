@@ -9,7 +9,7 @@ from app.core.errors import AppError
 from app.db.models import Chatbot, ChatbotCategory, User
 from app.lib.embed_token import generate_embed_token
 from app.lib.lead_config import public_lead_config
-from app.lib.plans import plan_for
+from app.lib.plans import feature_allowed, plan_for
 from app.rag.vector_store import PgVectorStore
 
 router = APIRouter(prefix="/api", tags=["chatbots"])
@@ -26,10 +26,6 @@ async def owned_chatbot(db, user_id: str, chatbot_id: str) -> Chatbot:
     if not bot:
         raise AppError("Chatbot not found", 404)
     return bot
-
-
-async def _can_remove_branding(db, plan: str | None) -> bool:
-    return (await plan_for(db, plan))["features"]["removeBranding"]
 
 
 def out(bot: Chatbot) -> dict:
@@ -89,8 +85,11 @@ async def update_chatbot(chatbot_id: str, body: ChatbotUpdate, user: CurrentUser
     for key in ("name", "status"):
         if not changes.get(key):
             changes.pop(key, None)
-    if not await _can_remove_branding(db, user.plan):  # Pro-only: the UI locks it, this is the real gate
+    # Pro-only features: the UI locks them, this is the real gate.
+    if not await feature_allowed(db, user.plan, "removeBranding"):
         changes.pop("show_powered_by", None)
+    if not await feature_allowed(db, user.plan, "leadCapture") and changes.get("lead_config"):
+        changes["lead_config"] = {**changes["lead_config"], "enabled": False}
     for key, value in changes.items():
         setattr(bot, key, value)
     await db.commit()
@@ -139,9 +138,13 @@ async def public_chatbot(embed_token: str, db: DB):
         raise AppError("Chatbot not found", 404)
     owner = await db.get(User, bot.user_id)
     # A downgraded owner may still have the badge stored as hidden; the plan wins.
-    show_badge = bot.show_powered_by or not await _can_remove_branding(db, owner.plan if owner else None)
+    owner_plan = owner.plan if owner else None
+    show_badge = bot.show_powered_by or not await feature_allowed(db, owner_plan, "removeBranding")
+    lead_config = public_lead_config(bot.lead_config)
+    if not await feature_allowed(db, owner_plan, "leadCapture"):
+        lead_config["enabled"] = False
     data = PublicChatbotOut.model_validate(
         {**{k: getattr(bot, k) for k in PublicChatbotOut.model_fields if k != "lead_config"},
-         "lead_config": public_lead_config(bot.lead_config), "show_powered_by": show_badge}
+         "lead_config": lead_config, "show_powered_by": show_badge}
     )
     return {"chatbot": data.model_dump(by_alias=True, mode="json")}

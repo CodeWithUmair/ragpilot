@@ -19,6 +19,7 @@ from app.db.models import Chatbot, ChatMessage, ChatSession, User
 from app.db.session import SessionLocal
 from app.lib.embed_token import is_embed_token
 from app.lib.lead_config import resolve_lead_config
+from app.lib.plans import feature_allowed
 from app.lib.rate_limit import rate_limit
 from app.lib.sse import SSE_HEADERS, SSE_MEDIA_TYPE, sse
 from app.rag.graph import ChatDeps, chat_graph
@@ -80,7 +81,7 @@ async def chat(request: Request):
     ip = client_ip(request)
 
     async with SessionLocal() as db:
-        bot, owner = None, None
+        bot, owner, leads_allowed = None, None, False
         if body.token and is_embed_token(body.token):
             namespace = body.token
             row = (await db.execute(
@@ -88,6 +89,7 @@ async def chat(request: Request):
             )).first()
             if row:
                 bot, owner = row
+                leads_allowed = await feature_allowed(db, owner.plan, "leadCapture")  # Pro-only
         elif body.url:
             # Legacy URL-only path: hash-of-URL namespaces no longer match any
             # chatbot, so this answers "no information" by design.
@@ -97,7 +99,10 @@ async def chat(request: Request):
 
     over_limit = bool(owner and owner.message_usage >= owner.message_limit)
     chatbot_id = bot.id if bot else None
-    lead_owner = LeadOwner(bot.id, bot.name, bot.lead_config, owner.email) if bot and owner else None
+    lead_config = resolve_lead_config(bot.lead_config if bot else None)
+    if not leads_allowed:  # a downgraded owner may still have it stored as enabled
+        lead_config["enabled"] = False
+    lead_owner = LeadOwner(bot.id, bot.name, bot.lead_config, owner.email) if bot and owner and leads_allowed else None
 
     async def stream():
         # The generator owns its DB session: a request-scoped one would already
@@ -108,7 +113,7 @@ async def chat(request: Request):
                 llm=llm, embedder=embedder, store=PgVectorStore(db), namespace=namespace,
                 business_name=(bot.name or "").strip() or None if bot else None,
                 persona=bot.system_prompt if bot else None,
-                lead_config=resolve_lead_config(bot.lead_config if bot else None),
+                lead_config=lead_config,
                 leads=DbLeadStore(db, lead_owner, namespace=namespace, session_id=session_id,
                                   visitor_id=visitor_id, host_page_url=body.hostPageUrl) if lead_owner else None,
             )

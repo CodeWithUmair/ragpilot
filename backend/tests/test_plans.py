@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from app.lib.plans import PLANS, get_plan, normalize_plan_key, plan_for
+from app.lib.plans import PLANS, feature_allowed, get_plan, normalize_plan_key, plan_for
 
 
 @pytest.mark.parametrize(
@@ -57,3 +57,10 @@ async def test_plan_for_applies_admin_limits():
     assert (plan["messageLimit"], plan["chatbotLimit"], plan["pageLimit"]) == (5, 6, 7)
     assert plan["label"] == "Pro"  # everything else still comes from the defaults
     assert await plan_for(_FakeDB(None), "pro") is PLANS["pro"]
+
+
+async def test_feature_allowed_follows_the_plan():
+    free, pro = _FakeDB(None), _FakeDB(None)
+    assert not await feature_allowed(free, "free", "leadCapture")
+    assert not await feature_allowed(free, "free", "removeBranding")
+    assert await feature_allowed(pro, "pro", "leadCapture")

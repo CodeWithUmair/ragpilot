@@ -162,6 +162,10 @@ async def test_chatbot_crud_and_plan_limit(client):
     hidden = await client.patch(f"/api/chatbots/{bot['id']}", json={"showPoweredBy": False}, headers=h)
     assert hidden.json()["chatbot"]["showPoweredBy"] is True
 
+    # Lead capture is Pro-only too: a free user's enabled flag is stored as off.
+    leads = await client.patch(f"/api/chatbots/{bot['id']}", json={"leadConfig": {"enabled": True}}, headers=h)
+    assert leads.json()["chatbot"]["leadConfig"]["enabled"] is False
+
 
 async def test_admin_plan_routes_reject_non_admin(client):
     h = (await signup(client))["headers"]
