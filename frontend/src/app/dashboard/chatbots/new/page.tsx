@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { config } from '@/lib/config';
-import { useCreateChatbot } from '@/hooks/useApi';
+import { useCreateChatbot, useMe } from '@/hooks/useApi';
+import { planAllows } from '@/lib/plans';
 import toast from 'react-hot-toast';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -412,6 +413,8 @@ function Step1Source({ state, update }: StepProps) {
 // ─── Step 2: Appearance ───────────────────────────────────────────────────────
 
 function Step2Appearance({ state, update }: StepProps) {
+  const { data: me } = useMe();
+  const canRemoveBranding = planAllows(me?.plan ?? 'free', 'removeBranding');
   return (
     <div className="space-y-6">
       <div>
@@ -512,19 +515,20 @@ function Step2Appearance({ state, update }: StepProps) {
         <div>
           <p className="text-sm font-medium">Show "Powered by RagPilot"</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Upgrade to Scale plan to remove branding
+            {canRemoveBranding ? 'Turn off to remove branding' : 'Upgrade to Pro to remove branding'}
           </p>
         </div>
         <button
           onClick={() => update('showPoweredBy', !state.showPoweredBy)}
+          disabled={!canRemoveBranding}
           className={cn(
-            'relative h-6 w-10 rounded-full transition-colors',
-            state.showPoweredBy ? 'bg-primary' : 'bg-muted'
+            'relative h-6 w-10 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+            state.showPoweredBy || !canRemoveBranding ? 'bg-primary' : 'bg-muted'
           )}
         >
           <div className={cn(
             'absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform',
-            state.showPoweredBy ? 'translate-x-4' : 'translate-x-0.5'
+            state.showPoweredBy || !canRemoveBranding ? 'translate-x-4' : 'translate-x-0.5'
           )} />
         </button>
       </div>

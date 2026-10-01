@@ -158,6 +158,10 @@ async def test_chatbot_crud_and_plan_limit(client):
     public = (await client.get(f"/api/chatbots/public/{bot['embedToken']}")).json()["chatbot"]
     assert "webhookUrl" not in public["leadConfig"]
 
+    # Hiding the "Powered by" badge is Pro-only: a free user's attempt is ignored.
+    hidden = await client.patch(f"/api/chatbots/{bot['id']}", json={"showPoweredBy": False}, headers=h)
+    assert hidden.json()["chatbot"]["showPoweredBy"] is True
+
 
 async def test_admin_plan_routes_reject_non_admin(client):
     h = (await signup(client))["headers"]

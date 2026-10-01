@@ -12,6 +12,7 @@ import {
 import Link from 'next/link';
 import {
   useChatbot,
+  useMe,
   useSaveCategories,
   useResetKnowledge,
   useDiscoverCategories,
@@ -22,6 +23,7 @@ import {
 } from '../../../../hooks/useApi';
 import { useScrapeStream } from '../../../../hooks/useScrapeStream';
 import { cn } from '../../../../lib/utils';
+import { planAllows } from '../../../../lib/plans';
 import { StatusBadge } from '../../../../components/ui/StatusBadge';
 import { Button } from '../../../../components/ui/button';
 import { ColorPicker } from '../../../../components/ui/color-picker';
@@ -767,6 +769,10 @@ function CustomizeTab({
     systemPrompt: chatbot.systemPrompt ?? '',
   });
   const [saving, setSaving] = useState(false);
+  const { data: me } = useMe();
+  // Hiding the badge is Pro-only (the API enforces it too); free users see it locked on.
+  const canRemoveBranding = planAllows(me?.plan ?? 'free', 'removeBranding');
+  const showBadge = canRemoveBranding ? form.showPoweredBy : true;
 
   // Lead capture config (stored as a JSON blob on the chatbot). `required` is
   // derived on save (a contact method is always required).
@@ -1165,23 +1171,32 @@ function CustomizeTab({
           <div className="flex items-center justify-between gap-3 pt-1">
             <div>
               <p className="text-xs font-medium">Show &ldquo;Powered by&rdquo;</p>
-              <p className="text-xs text-muted-foreground">Pro hides this badge.</p>
+              <p className="text-xs text-muted-foreground">
+                {canRemoveBranding ? (
+                  'Turn off to hide this badge.'
+                ) : (
+                  <>
+                    <Link href="/dashboard/settings" className="text-primary hover:underline">Upgrade to Pro</Link>{' '}
+                    to hide this badge.
+                  </>
+                )}
+              </p>
             </div>
             <button
               type="button"
               role="switch"
-              aria-checked={form.showPoweredBy}
+              aria-checked={showBadge}
               onClick={() => setForm({ ...form, showPoweredBy: !form.showPoweredBy })}
-              disabled={saving}
+              disabled={saving || !canRemoveBranding}
               className={cn(
                 'relative h-5 w-9 rounded-full transition-colors shrink-0 disabled:cursor-not-allowed disabled:opacity-50',
-                form.showPoweredBy ? 'bg-primary' : 'bg-muted',
+                showBadge ? 'bg-primary' : 'bg-muted',
               )}
             >
               <span
                 className={cn(
                   'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all',
-                  form.showPoweredBy ? 'right-0.5' : 'left-0.5',
+                  showBadge ? 'right-0.5' : 'left-0.5',
                 )}
               />
             </button>
@@ -1269,7 +1284,7 @@ function CustomizeTab({
             inputPlaceholder={form.inputPlaceholder}
             primaryColor={form.primaryColor}
             theme={form.widgetTheme}
-            showPoweredBy={form.showPoweredBy}
+            showPoweredBy={showBadge}
             personalityKey={form.personalityType}
           />
         </div>

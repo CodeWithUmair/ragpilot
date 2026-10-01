@@ -6,7 +6,7 @@ from sqlalchemy import delete, func, select
 from app.api.schemas import CategoriesIn, ChatbotCreate, ChatbotOut, ChatbotUpdate, PublicChatbotOut
 from app.auth.deps import DB, CurrentUser
 from app.core.errors import AppError
-from app.db.models import Chatbot, ChatbotCategory
+from app.db.models import Chatbot, ChatbotCategory, User
 from app.lib.embed_token import generate_embed_token
 from app.lib.lead_config import public_lead_config
 from app.lib.plans import plan_for
@@ -26,6 +26,10 @@ async def owned_chatbot(db, user_id: str, chatbot_id: str) -> Chatbot:
     if not bot:
         raise AppError("Chatbot not found", 404)
     return bot
+
+
+async def _can_remove_branding(db, plan: str | None) -> bool:
+    return (await plan_for(db, plan))["features"]["removeBranding"]
 
 
 def out(bot: Chatbot) -> dict:
@@ -65,6 +69,8 @@ async def create_chatbot(body: ChatbotCreate, user: CurrentUser, db: DB):
         )
 
     fields = body.model_dump(exclude_unset=True, exclude={"url", "name"})
+    if not plan["features"]["removeBranding"]:
+        fields["show_powered_by"] = True
     bot = Chatbot(
         url=body.url, user_id=user.id, embed_token=generate_embed_token(),
         name=(body.name or "").strip() or name_from_url(body.url), **fields,
@@ -83,6 +89,8 @@ async def update_chatbot(chatbot_id: str, body: ChatbotUpdate, user: CurrentUser
     for key in ("name", "status"):
         if not changes.get(key):
             changes.pop(key, None)
+    if not await _can_remove_branding(db, user.plan):  # Pro-only: the UI locks it, this is the real gate
+        changes.pop("show_powered_by", None)
     for key, value in changes.items():
         setattr(bot, key, value)
     await db.commit()
@@ -129,8 +137,11 @@ async def public_chatbot(embed_token: str, db: DB):
     bot = await db.scalar(select(Chatbot).where(Chatbot.embed_token == embed_token))
     if not bot:
         raise AppError("Chatbot not found", 404)
+    owner = await db.get(User, bot.user_id)
+    # A downgraded owner may still have the badge stored as hidden; the plan wins.
+    show_badge = bot.show_powered_by or not await _can_remove_branding(db, owner.plan if owner else None)
     data = PublicChatbotOut.model_validate(
         {**{k: getattr(bot, k) for k in PublicChatbotOut.model_fields if k != "lead_config"},
-         "lead_config": public_lead_config(bot.lead_config)}
+         "lead_config": public_lead_config(bot.lead_config), "show_powered_by": show_badge}
     )
     return {"chatbot": data.model_dump(by_alias=True, mode="json")}
