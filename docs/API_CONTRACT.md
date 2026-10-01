@@ -74,6 +74,9 @@ Frames are `event: X\ndata: <single-line JSON>\n\n`.
 | GET `/api/analytics?chatbotId=all|<id>&from=YYYY-MM-DD&to=YYYY-MM-DD` | `{range, totals{conversations, messages, leads, visitors, conversionRate}, previous, series[{date, conversations, messages, leads}], hourly[{hour, messages}], leadStatus, topQuestions, topPages, bots}` |
 | GET `/api/admin/users?search&page&limit` | admin only: `{users: [{…, createdAt, chatbotCount}], total, page, limit}` |
 | PATCH `/api/admin/users/{id}/plan` `{plan}` | admin |
+| POST `/api/billing/checkout` | `{url}`: Lemon Squeezy hosted checkout for Pro (503 until `LEMONSQUEEZY_*` env is set) |
+| GET `/api/billing/portal` | `{url}`: Lemon Squeezy customer portal (cancel / update card) for the caller's subscription |
+| POST `/api/billing/webhook` | Lemon Squeezy → us, `X-Signature` HMAC-SHA256 verified; the only thing that changes a user's plan from billing |
 | POST `/api/admin/users/{id}/reset-usage` | admin |
 | GET `/api/admin/plans` | admin: `{plans: {free, pro}}` with admin-edited limits applied (`messageLimit`, `chatbotLimit`, `pageLimit`) |
 | PUT `/api/admin/plans/{plan}/limits` `{messageLimit, chatbotLimit, pageLimit}` | admin: all three required ints ≥ 1; applies to every user on the plan at once. Stored in `"PlanLimit"` (no row = defaults in `lib/plans.py`) |

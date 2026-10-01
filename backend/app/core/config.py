@@ -77,6 +77,12 @@ class Settings(BaseSettings):
     admin_emails: str | None = Field(None, validation_alias=AliasChoices("ADMIN_EMAILS", "ADMIN_EMAIL"))
     test_pro_emails: str | None = None
 
+    # ─── Billing (Lemon Squeezy) — all optional; checkout answers 503 until set ─
+    lemonsqueezy_api_key: str | None = None
+    lemonsqueezy_store_id: str | None = None
+    lemonsqueezy_pro_variant_id: str | None = None
+    lemonsqueezy_webhook_secret: str | None = None
+
     git_sha: str | None = None
 
     @property

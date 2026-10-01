@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy import text
 
-from app.api import analytics, chat, chatbots, leads, scrape, testing, users
+from app.api import analytics, billing, chat, chatbots, leads, scrape, testing, users
 from app.auth import routes as auth_routes
 from app.core.config import get_settings
 from app.core.cors import DualCORSMiddleware
@@ -43,7 +43,7 @@ app.add_middleware(DualCORSMiddleware)
 register_error_handlers(app)
 
 for router in (auth_routes.router, chat.router, chatbots.router, leads.router, scrape.router,
-               analytics.router, users.router, testing.router):
+               analytics.router, users.router, billing.router, testing.router):
     app.include_router(router)
 
 

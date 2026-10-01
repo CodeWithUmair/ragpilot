@@ -1,16 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
-import { useMe, useUpdateMe, useUpdateMyPlan } from '@/hooks/useApi';
+import {
+  queryKeys, useMe, useUpdateMe, useUpdateMyPlan, useStartCheckout, useOpenBillingPortal,
+} from '@/hooks/useApi';
 import { PLAN_LIST, getPlan } from '@/lib/plans';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+
+// Dev has no payment provider, so plan buttons flip the plan directly; production uses Lemon Squeezy.
+const IS_PROD = process.env.NODE_ENV === 'production';
 
 export default function SettingsPage() {
   const { data: user } = useMe();
   const updateMeMutation = useUpdateMe();
   const updatePlanMutation = useUpdateMyPlan();
+  const checkout = useStartCheckout();
+  const portal = useOpenBillingPortal();
+  const queryClient = useQueryClient();
+  // Back from checkout (?upgraded=1): the plan flips when Lemon Squeezy's webhook lands, a few seconds later.
+  const [justPaid] = useState(() => typeof window !== 'undefined' && window.location.search.includes('upgraded=1'));
+  const activating = justPaid && user?.plan !== 'pro';
+  useEffect(() => {
+    if (!activating) return;
+    const id = setInterval(() => queryClient.invalidateQueries({ queryKey: queryKeys.me }), 2000);
+    return () => clearInterval(id);
+  }, [activating, queryClient]);
   const [name, setName] = useState(user?.name ?? '');
 
   const currentPlan = user ? getPlan(user.plan) : PLAN_LIST[0];
@@ -25,6 +42,12 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-muted-foreground text-sm mt-1">Manage your account and plan.</p>
       </div>
+
+      {activating && (
+        <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm">
+          Payment received. Activating your Pro plan&hellip;
+        </div>
+      )}
 
       {/* Profile */}
       <section className="rounded-xl border border-border bg-card p-5 space-y-4">
@@ -135,11 +158,15 @@ export default function SettingsPage() {
                     size="sm"
                     variant={plan.key === 'pro' ? 'default' : 'outline'}
                     className="w-full"
-                    loading={updatePlanMutation.isPending}
-                    onClick={() => updatePlanMutation.mutate(plan.key)}
+                    loading={updatePlanMutation.isPending || checkout.isPending || portal.isPending}
+                    onClick={() => {
+                      if (!IS_PROD) updatePlanMutation.mutate(plan.key);
+                      else if (plan.key === 'pro') checkout.mutate();
+                      else portal.mutate(); // cancelling happens in the billing portal
+                    }}
                     data-testid={`plan-switch-${plan.key}`}
                   >
-                    {plan.key === 'pro' ? 'Upgrade to Pro' : 'Switch to Free'}
+                    {plan.key === 'pro' ? 'Upgrade to Pro' : IS_PROD ? 'Manage subscription' : 'Switch to Free'}
                   </Button>
                 )}
               </div>
@@ -147,7 +174,9 @@ export default function SettingsPage() {
           })}
         </div>
         <p className="text-xs text-muted-foreground">
-          Dev mode: plan changes are instant and free. In production this will be handled by Stripe checkout.
+          {IS_PROD
+            ? 'Payments are processed securely by Lemon Squeezy. Cancel any time from Manage subscription.'
+            : 'Dev mode: plan changes are instant and free. Production uses Lemon Squeezy checkout.'}
         </p>
       </section>
     </div>

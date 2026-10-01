@@ -206,6 +206,22 @@ export function useUpdateMyPlan() {
   });
 }
 
+// Production billing (Lemon Squeezy): both calls return a hosted page URL to send the browser to.
+function useRedirectTo(path: string, method: 'get' | 'post', errorMessage: string) {
+  return useMutation({
+    mutationFn: async () => (await api[method](path)).data.url as string,
+    onSuccess: (url) => {
+      window.location.href = url;
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message ?? errorMessage);
+    },
+  });
+}
+
+export const useStartCheckout = () => useRedirectTo('/billing/checkout', 'post', 'Could not start checkout');
+export const useOpenBillingPortal = () => useRedirectTo('/billing/portal', 'get', 'Could not open billing');
+
 export function useCompleteOnboarding() {
   const queryClient = useQueryClient();
   return useMutation({

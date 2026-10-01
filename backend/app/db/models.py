@@ -90,6 +90,7 @@ class User(Base):
     message_usage: Mapped[int] = mapped_column("messageUsage", Integer, default=0)
     message_limit: Mapped[int] = mapped_column("messageLimit", Integer, default=100)
     onboarding_completed: Mapped[bool] = mapped_column("onboardingCompleted", Boolean, default=False)
+    subscription_id: Mapped[str | None] = mapped_column("subscriptionId", String)  # Lemon Squeezy
     created_at: Mapped[datetime] = created_col()
     updated_at: Mapped[datetime] = updated_col()
 
