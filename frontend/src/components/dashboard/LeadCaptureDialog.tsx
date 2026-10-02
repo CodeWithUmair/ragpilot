@@ -53,7 +53,7 @@ export function LeadCaptureDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* No auto-focus: it would land on the first (i) button and open its tooltip on load. */}
       <DialogContent
-        className="sm:max-w-2xl max-h-[85vh] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:var(--color-border)_transparent]"
+        className="sm:max-w-4xl max-h-[85vh] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:var(--color-border)_transparent]"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
