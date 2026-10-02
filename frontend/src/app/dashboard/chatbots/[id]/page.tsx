@@ -767,7 +767,6 @@ function CustomizeTab({
     personalityType: chatbot.personalityType ?? 'general',
     primaryColor: chatbot.primaryColor ?? '#6B46C1',
     widgetTheme: (chatbot.widgetTheme ?? 'auto') as 'light' | 'dark' | 'auto',
-    showPoweredBy: chatbot.showPoweredBy ?? true,
     // We track this so picking a tone preset can replace the prompt, but it
     // isn't exposed as an editable field on this tab (advanced editing lives
     // in Settings).
@@ -778,7 +777,7 @@ function CustomizeTab({
   const queryClient = useQueryClient();
   // Hiding the badge is Pro-only (the API enforces it too); free users see it locked on.
   const canRemoveBranding = planAllows(me?.plan ?? 'free', 'removeBranding');
-  const showBadge = canRemoveBranding ? form.showPoweredBy : true;
+  const showBadge = !canRemoveBranding; // Pro removes the badge automatically
   const canCaptureLeads = planAllows(me?.plan ?? 'free', 'leadCapture');
   const [leadOpen, setLeadOpen] = useState(false);
 
@@ -1048,39 +1047,13 @@ function CustomizeTab({
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 pt-1">
-            <div>
-              <p className="text-xs font-medium">Show &ldquo;Powered by&rdquo;</p>
-              <p className="text-xs text-muted-foreground">
-                {canRemoveBranding ? (
-                  'Turn off to hide this badge.'
-                ) : (
-                  <>
-                    <Link href="/dashboard/settings" className="text-primary hover:underline">Upgrade to Pro</Link>{' '}
-                    to hide this badge.
-                  </>
-                )}
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={showBadge}
-              onClick={() => setForm({ ...form, showPoweredBy: !form.showPoweredBy })}
-              disabled={saving || !canRemoveBranding}
-              className={cn(
-                'relative h-5 w-9 rounded-full transition-colors shrink-0 disabled:cursor-not-allowed disabled:opacity-50',
-                showBadge ? 'bg-primary' : 'bg-muted',
-              )}
-            >
-              <span
-                className={cn(
-                  'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all',
-                  showBadge ? 'right-0.5' : 'left-0.5',
-                )}
-              />
-            </button>
-          </div>
+          {!canRemoveBranding && (
+            <p className="text-xs text-muted-foreground pt-1">
+              Free plans show a small &ldquo;Powered by RagPilot&rdquo; badge.{' '}
+              <Link href="/dashboard/settings" className="text-primary hover:underline">Upgrade to Pro</Link>{' '}
+              to remove it.
+            </p>
+          )}
         </section>
 
         {/* Tone */}

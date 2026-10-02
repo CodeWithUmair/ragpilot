@@ -158,9 +158,10 @@ async def test_chatbot_crud_and_plan_limit(client):
     public = (await client.get(f"/api/chatbots/public/{bot['embedToken']}")).json()["chatbot"]
     assert "webhookUrl" not in public["leadConfig"]
 
-    # Hiding the "Powered by" badge is Pro-only: a free user's attempt is ignored.
-    hidden = await client.patch(f"/api/chatbots/{bot['id']}", json={"showPoweredBy": False}, headers=h)
-    assert hidden.json()["chatbot"]["showPoweredBy"] is True
+    # The "Powered by" badge follows the plan (Pro removes it), not the stored flag.
+    await client.patch(f"/api/chatbots/{bot['id']}", json={"showPoweredBy": False}, headers=h)
+    public = (await client.get(f"/api/chatbots/public/{bot['embedToken']}")).json()["chatbot"]
+    assert public["showPoweredBy"] is True
 
     # Lead capture is Pro-only too: a free user's enabled flag is stored as off.
     leads = await client.patch(f"/api/chatbots/{bot['id']}", json={"leadConfig": {"enabled": True}}, headers=h)

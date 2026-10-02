@@ -33,7 +33,6 @@ interface OnboardingState {
   widgetTheme: WidgetTheme;
   primaryColor: string;
   logoUrl: string;
-  showPoweredBy: boolean;
 
   // Step 3 - Personality
   personalityType: PersonalityType;
@@ -122,7 +121,6 @@ export default function NewChatbotPage() {
     widgetTheme: 'auto',
     primaryColor: '#6B46C1',
     logoUrl: '',
-    showPoweredBy: true,
     personalityType: 'general',
     customPrompt: '',
     welcomeMessage: 'Hey! What are you looking for today?',
@@ -162,7 +160,6 @@ export default function NewChatbotPage() {
         themeColor: state.primaryColor,
         primaryColor: state.primaryColor,
         widgetTheme: state.widgetTheme,
-        showPoweredBy: state.showPoweredBy,
       });
 
       const bot = response.data.chatbot;
@@ -413,8 +410,6 @@ function Step1Source({ state, update }: StepProps) {
 // ─── Step 2: Appearance ───────────────────────────────────────────────────────
 
 function Step2Appearance({ state, update }: StepProps) {
-  const { data: me } = useMe();
-  const canRemoveBranding = planAllows(me?.plan ?? 'free', 'removeBranding');
   return (
     <div className="space-y-6">
       <div>
@@ -508,29 +503,6 @@ function Step2Appearance({ state, update }: StepProps) {
             />
           </div>
         </div>
-      </div>
-
-      {/* Powered by toggle */}
-      <div className="flex items-center justify-between rounded-xl border border-border p-4">
-        <div>
-          <p className="text-sm font-medium">Show "Powered by RagPilot"</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {canRemoveBranding ? 'Turn off to remove branding' : 'Upgrade to Pro to remove branding'}
-          </p>
-        </div>
-        <button
-          onClick={() => update('showPoweredBy', !state.showPoweredBy)}
-          disabled={!canRemoveBranding}
-          className={cn(
-            'relative h-6 w-10 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-            state.showPoweredBy || !canRemoveBranding ? 'bg-primary' : 'bg-muted'
-          )}
-        >
-          <div className={cn(
-            'absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform',
-            state.showPoweredBy || !canRemoveBranding ? 'translate-x-4' : 'translate-x-0.5'
-          )} />
-        </button>
       </div>
     </div>
   );
@@ -678,6 +650,8 @@ function Step4Deploy({ bot }: { bot: any }) {
 // ─── Chat Preview (right panel) ───────────────────────────────────────────────
 
 function ChatPreview({ state }: { state: OnboardingState }) {
+  const { data: me } = useMe();
+  const showBadge = !planAllows(me?.plan ?? 'free', 'removeBranding'); // Pro removes the badge
   const botName = state.name || 'My Assistant';
   const themeColor = state.primaryColor || '#6B46C1';
 
@@ -772,7 +746,7 @@ function ChatPreview({ state }: { state: OnboardingState }) {
         </div>
 
         {/* Powered by */}
-        {state.showPoweredBy && (
+        {showBadge && (
           <div
             className="text-center py-1.5 text-[10px]"
             style={{ color: subTextColor, background: bg, borderTop: `1px solid ${borderColor}` }}

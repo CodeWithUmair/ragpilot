@@ -65,8 +65,6 @@ async def create_chatbot(body: ChatbotCreate, user: CurrentUser, db: DB):
         )
 
     fields = body.model_dump(exclude_unset=True, exclude={"url", "name"})
-    if not plan["features"]["removeBranding"]:
-        fields["show_powered_by"] = True
     bot = Chatbot(
         url=body.url, user_id=user.id, embed_token=generate_embed_token(),
         name=(body.name or "").strip() or name_from_url(body.url), **fields,
@@ -85,9 +83,7 @@ async def update_chatbot(chatbot_id: str, body: ChatbotUpdate, user: CurrentUser
     for key in ("name", "status"):
         if not changes.get(key):
             changes.pop(key, None)
-    # Pro-only features: the UI locks them, this is the real gate.
-    if not await feature_allowed(db, user.plan, "removeBranding"):
-        changes.pop("show_powered_by", None)
+    # Pro-only feature: the UI locks it, this is the real gate.
     if not await feature_allowed(db, user.plan, "leadCapture") and changes.get("lead_config"):
         changes["lead_config"] = {**changes["lead_config"], "enabled": False}
     for key, value in changes.items():
@@ -137,9 +133,9 @@ async def public_chatbot(embed_token: str, db: DB):
     if not bot:
         raise AppError("Chatbot not found", 404)
     owner = await db.get(User, bot.user_id)
-    # A downgraded owner may still have the badge stored as hidden; the plan wins.
     owner_plan = owner.plan if owner else None
-    show_badge = bot.show_powered_by or not await feature_allowed(db, owner_plan, "removeBranding")
+    # The badge follows the owner's plan (Pro removes it); the stored flag is not consulted.
+    show_badge = not await feature_allowed(db, owner_plan, "removeBranding")
     lead_config = public_lead_config(bot.lead_config)
     if not await feature_allowed(db, owner_plan, "leadCapture"):
         lead_config["enabled"] = False
