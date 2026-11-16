@@ -17,6 +17,8 @@ __pycache__/
 htmlcov/
 
 # Env files (templates are committed)
+.env
+.env.*
 !.env.example
 
 # Playwright
@@ -30,4 +32,4 @@ playwright/.cache/
 .DS_Store
 Thumbs.db
 .idea/
-config.bat
+.vscode/
