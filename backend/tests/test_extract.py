@@ -115,6 +115,45 @@ def test_short_blocks_ignored():
     assert [c.content for c in parse_html(html).chunks] == ["Title\nThis paragraph is definitely long enough to keep."]
 
 
+# Real markup from decryptedlabs.io (classes/SVG paths trimmed). These facts were
+# invisible to the bot: each piece is under MIN_BLOCK_CHARS or in a tag we don't walk.
+STATS_PAGE = """<html><head><title>NFStay case study</title>
+  <meta name="description" content="Tell us about your project. We respond in under 5 minutes."></head><body>
+  <div><div><p>12+</p><div><svg><path d="M2 12h20"></path></svg><p>Countries Served</p></div></div>
+       <div><span>$3M+</span><span>Raised By Clients</span></div></div>
+  <dl><div><dd>120+</dd><dt>Tokenized properties</dt></div><div><dd>4.8/5</dd><dt>Average user rating</dt></div></dl>
+  <dl><div><dt>Industry</dt><dd>PropTech / Real-World Assets / DeFi</dd></div>
+      <div><dt>Region</dt><dd>United Kingdom</dd></div></dl>
+  <dl><dt>Founded</dt><dd>2019</dd><dt>Team size</dt><dd>40 engineers</dd></dl>
+  <div><span>Book a call</span><span>Read more</span></div>
+</body></html>"""
+
+
+def test_stat_and_definition_pairs_become_key_fact_chunks():
+    facts = [c for c in parse_html(STATS_PAGE).chunks if c.section_type == "facts"]
+    assert [c.content for c in facts] == [
+        "[NFStay case study]\nKey facts: 12+ Countries Served; $3M+ Raised By Clients",
+        "[NFStay case study]\nKey facts: 120+ Tokenized properties; 4.8/5 Average user rating",
+        "[NFStay case study]\nKey facts: Industry: PropTech / Real-World Assets / DeFi; Region: United Kingdom",
+        "[NFStay case study]\nKey facts: Founded: 2019; Team size: 40 engineers",
+    ]
+    assert all(c.heading_path == "NFStay case study" for c in facts)  # the model sees which page
+    assert not any("Book a call" in c.content for c in facts)  # two CTA spans aren't a stat
+
+
+def test_meta_description_is_indexed():
+    chunks = parse_html(STATS_PAGE).chunks
+    assert any(c.section_type == "description" and "under 5 minutes" in c.content for c in chunks)
+
+
+def test_site_wide_stat_strip_dedupes_across_pages():
+    other = STATS_PAGE.replace("NFStay case study", "About us")
+    seen: set[str] = set()
+    first = [c for c in clean_chunks(parse_html(STATS_PAGE).chunks, seen) if c.section_type == "facts"]
+    second = [c for c in clean_chunks(parse_html(other).chunks, seen) if c.section_type == "facts"]
+    assert len(first) == 4 and second == []  # same strip on every page is stored once
+
+
 # --- split_text ------------------------------------------------------------
 
 def test_split_text_sizes_and_overlap():

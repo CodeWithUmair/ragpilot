@@ -1,0 +1,1112 @@
+{
+  "at": "2026-11-19T13:55:16+00:00",
+  "config": {
+    "chat_model": "gpt-4o-mini",
+    "embed_model": "text-embedding-3-small",
+    "judge_model": "gpt-4.1",
+    "namespace": "eval-decryptedlabs",
+    "dataset": "decryptedlabs.json",
+    "retrieval": {
+      "RETRIEVAL_POOL": 40,
+      "CONTEXT_CHUNKS": 12,
+      "MIN_RAW_SCORE": 0.18,
+      "RELATIVE_SCORE_MARGIN": 0.22,
+      "CONFIDENT_SCORE": 0.35,
+      "SOURCE_MIN_SCORE": 0.5
+    }
+  },
+  "tokens": {
+    "text-embedding-3-small": [
+      431,
+      0
+    ],
+    "gpt-4o-mini": [
+      58657,
+      2172
+    ]
+  },
+  "summary": {
+    "n": 42,
+    "accuracy": 0.917,
+    "fully_correct": 36,
+    "hallucination_rate": 0.0,
+    "retrieval_hit_rate": 1.0,
+    "citation_hit_rate": 0.833,
+    "rewrites_used": 1,
+    "ttft_p50_s": 1.31,
+    "ttft_p95_s": 1.65,
+    "total_p50_s": 1.96,
+    "total_p95_s": 3.14,
+    "cost_usd": 0.01011,
+    "cost_per_100_usd": 0.0241,
+    "by_kind": {
+      "answerable": {
+        "n": 30,
+        "accuracy": 0.883
+      },
+      "decline": {
+        "n": 6,
+        "accuracy": 1.0
+      },
+      "follow_up": {
+        "n": 3,
+        "accuracy": 1.0
+      },
+      "trap": {
+        "n": 3,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "a01",
+      "kind": "answerable",
+      "question": "What does Decrypted Labs do?",
+      "answer": "Decrypted Labs helps companies turn complex technologies into products that feel clear, reliable, and valuable to use. We specialize in product development at the intersection of AI, blockchain, Web3, fintech, and enterprise software. Our approach focuses on making advanced technology understandable and usable, ensuring strong engineering, product thinking, security, and user experience are prioritized. You can learn more about us here: https://www.decryptedlabs.io/about-us.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/blockchains/hire-ethereum",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-developers",
+        "https://www.decryptedlabs.io/services/custom-software-development",
+        "https://www.decryptedlabs.io/services/mobile-app-development",
+        "https://www.decryptedlabs.io/services/product-design"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/product-design",
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/services/mobile-app-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.23,
+      "total_s": 3.636,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately describes Decrypted Labs' focus on building AI, blockchain/Web3, fintech, and enterprise software products, emphasizing product thinking, engineering, security, and design.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a02",
+      "kind": "answerable",
+      "question": "How many countries have you served?",
+      "answer": "We have served clients in 12 or more countries.",
+      "context_sources": [
+        "https://www.decryptedlabs.io",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/services/mobile-app-development"
+      ],
+      "cited_sources": [],
+      "rewrites": 0,
+      "ttft_s": 1.248,
+      "total_s": 1.474,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states the company has served 12 or more countries, matching the expected answer.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "a03",
+      "kind": "answerable",
+      "question": "How many users have your clients onboarded?",
+      "answer": "Our clients have onboarded over 200,000 users.",
+      "context_sources": [
+        "https://www.decryptedlabs.io",
+        "https://www.decryptedlabs.io/case-studies",
+        "https://www.decryptedlabs.io/contact-us",
+        "https://www.decryptedlabs.io/developers/hire-blockchain-developers",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-developers",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/services/blockchain-development",
+        "https://www.decryptedlabs.io/services/dapp-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-developers",
+        "https://www.decryptedlabs.io/developers/hire-blockchain-developers",
+        "https://www.decryptedlabs.io/services/dapp-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.196,
+      "total_s": 1.394,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states the expected fact of 200K+ users onboarded.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "a04",
+      "kind": "answerable",
+      "question": "How much money have your clients raised?",
+      "answer": "Our clients have raised over $3 million. If you have any specific questions or need further information, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io",
+        "https://www.decryptedlabs.io/developers/hire-blockchain-developers",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-developers",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/services/blockchain-development",
+        "https://www.decryptedlabs.io/services/dapp-development",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/developers/hire-blockchain-developers",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-developers",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.348,
+      "total_s": 1.666,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states that clients have raised over $3 million, matching the expected answer.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "a05",
+      "kind": "answerable",
+      "question": "What kinds of AI agents can you build?",
+      "answer": "We can build custom AI agents for various purposes, including support, sales, CRM, voice workflows, data retrieval, and business automation. If you would like more information or have specific requirements, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/developers/hire-next-js-developers",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/custom-software-development",
+        "https://www.decryptedlabs.io/services/dapp-development",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams",
+        "https://www.decryptedlabs.io/services/generative-ai-development",
+        "https://www.decryptedlabs.io/services/product-design"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams",
+        "https://www.decryptedlabs.io/services/generative-ai-development",
+        "https://www.decryptedlabs.io/services/custom-software-development",
+        "https://www.decryptedlabs.io/services/product-design"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.204,
+      "total_s": 1.907,
+      "verdict": "partial",
+      "hallucinated": false,
+      "reason": "The bot lists several correct types (support, sales, CRM, voice, data retrieval, automation) but omits others like document intelligence, multi-agent systems, and research agents.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a06",
+      "kind": "answerable",
+      "question": "If I use your AI support agent, can it hand difficult cases over to a human?",
+      "answer": "Yes, our AI support agents are designed to handle human handoff for sensitive or complex cases. This ensures that when the AI encounters a difficult situation, it can escalate the issue to a human team member for further assistance. If you have more questions or need further details, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.356,
+      "total_s": 2.099,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot confirms human handoff for complex cases and mentions escalation, matching the expected answer and context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a07",
+      "kind": "answerable",
+      "question": "Can your AI agents connect to our CRM and helpdesk?",
+      "answer": "Yes, our AI agents can connect to your CRM and helpdesk systems. We ensure that the agents have access to the right systems to complete useful work, which includes integration with CRMs, databases, helpdesks, and custom APIs. If you would like more information or to discuss your specific needs, feel free to reach out to our team.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.205,
+      "total_s": 2.124,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states that AI agents can connect to CRMs and helpdesks, matching the expected answer and context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a08",
+      "kind": "answerable",
+      "question": "What can a voice AI agent handle for my business?",
+      "answer": "A voice AI agent can handle various tasks for your business, including:\n\n- Intake processes\n- Appointment handling\n- Lead qualification\n- Customer support\n- Status updates\n- Operational call handling\n\nThese capabilities can help streamline workflows and improve efficiency in your operations. If you would like to discuss further or have specific requirements, feel free to reach out to our team.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.472,
+      "total_s": 2.438,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot answer lists all the expected phone-based workflows and does not add unsupported details.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a09",
+      "kind": "answerable",
+      "question": "How do you keep AI agents secure?",
+      "answer": "We design AI agents with role-based access, permission limits, safe actions, restricted data access, and approval rules where sensitive decisions or actions require human control. This approach helps ensure the security of the AI agents. If you have more specific questions or need further details, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/blockchain-development",
+        "https://www.decryptedlabs.io/services/custom-software-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/blockchain-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.211,
+      "total_s": 1.993,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot answer matches all expected security measures and does not add unsupported details.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a10",
+      "kind": "answerable",
+      "question": "What did you build for Degen Forest?",
+      "answer": "We built Degen Forest, a non-custodial multi-chain crypto wallet that supports over 8 blockchains and 200 digital assets. The wallet provides a seamless experience for buying, storing, staking, swapping, and sending digital assets, all within one platform. It includes KYC and a fiat on/off-ramp with the Bank of Brazil, ensuring a bank-grade experience for users. Additionally, fraud monitoring runs in the background to enhance security.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.493,
+      "total_s": 2.617,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately lists all key features: non-custodial, multi-chain, 8+ blockchains, 200+ assets, KYC, Bank of Brazil fiat on/off-ramp, and adds true extra detail from the context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a11",
+      "kind": "answerable",
+      "question": "How much did Degen Forest raise?",
+      "answer": "Degen Forest raised over $3 million in early funding.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.308,
+      "total_s": 1.56,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states that Degen Forest raised over $3 million in early funding, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a12",
+      "kind": "answerable",
+      "question": "What is the minimum investment on NFStay and which country is it in?",
+      "answer": "The minimum investment on NFStay is $1,000. However, the Context does not specify which country NFStay operates in. If you need more information about the location or other details, I can help you contact the team.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.385,
+      "total_s": 2.037,
+      "verdict": "partial",
+      "hallucinated": false,
+      "reason": "The bot correctly states the $1,000 minimum investment but omits that the region is the United Kingdom, which is present in the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a13",
+      "kind": "answerable",
+      "question": "How many properties has NFStay tokenized?",
+      "answer": "NFStay has tokenized over 120 properties.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.421,
+      "total_s": 1.573,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states that NFStay has tokenized over 120 properties, matching the expected answer and context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a14",
+      "kind": "answerable",
+      "question": "How long did it take to get Penthian into production?",
+      "answer": "It took nine months to get Penthian into production.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.345,
+      "total_s": 1.568,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot gives the exact expected answer with no extra or incorrect information.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a15",
+      "kind": "answerable",
+      "question": "Which regulations does the Penthian platform comply with?",
+      "answer": "The Penthian platform complies with the FSC Mauritius regulations, as well as international rules including KYC/AML, audit trails, and reporting standards. If you have more specific questions or need further details, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.244,
+      "total_s": 1.932,
+      "verdict": "partial",
+      "hallucinated": false,
+      "reason": "The bot mentions FSC Mauritius and general international standards but omits MiCA and FATF specifically.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a16",
+      "kind": "answerable",
+      "question": "How many users does EARN'M have?",
+      "answer": "EARN'M has over 45 million users.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.304,
+      "total_s": 1.44,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot gave the correct user count as supported by the context and expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a17",
+      "kind": "answerable",
+      "question": "What did you do for EARN'M?",
+      "answer": "For EARN'M, Decrypted Labs provided on-demand design support with no minimum commitment. We assigned Web3-experienced designers who integrated into EARN'M's Slack, Figma, and project tools, attending daily standups and collaborating directly with engineers and project managers. This approach allowed EARN'M to scale design capacity up for major launches and down during maintenance, without any off-boarding overhead. Our support helped EARN'M maintain design excellence and development velocity across their rapidly expanding Web3 ecosystem. \n\nIf you would like more details, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.238,
+      "total_s": 2.619,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately describes the on-demand Web3 design support, staff augmentation model, integration into EARN'M's tools, and scaling capacity, matching the expected answer and context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a18",
+      "kind": "answerable",
+      "question": "What types of smart contracts do you audit?",
+      "answer": "We audit various types of smart contracts, including:\n\n1. DeFi contracts across swaps, staking, lending, rewards, liquidity, fees, and other protocol-specific financial logic.\n2. ERC-20, ERC-721, ERC-1155, and custom token contracts, focusing on permissions, supply logic, transfers, minting, burning, and security risks.\n3. Real World Asset (RWA) and tokenization contracts, covering asset issuance, ownership, transfers, permissions, settlement logic, and protocol-specific business rules.\n\nIf you have a specific type of contract in mind, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/services/smart-contract-auditing"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.343,
+      "total_s": 2.84,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot lists all expected contract types and relevant details without adding unsupported facts.",
+      "retrieval_hit": true,
+      "citation_hit": false
+    },
+    {
+      "id": "a19",
+      "kind": "answerable",
+      "question": "Which chains do your Solidity developers work on?",
+      "answer": "Our Solidity developers work on Ethereum, as well as EVM-compatible chains such as Polygon, Base, Arbitrum, Optimism, BNB Chain, Avalanche, and other major networks. If you have specific requirements or need more information, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.326,
+      "total_s": 2.033,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot lists all the expected EVM chains and does not add unsupported details.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a20",
+      "kind": "answerable",
+      "question": "If I hire a Solidity developer from you, which tools will we collaborate in?",
+      "answer": "When you hire a Solidity developer from Decrypted Labs, you can collaborate through tools like Slack, GitHub, Jira, Notion, or your preferred project management workflow. If you have any specific requirements or need further assistance, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.653,
+      "total_s": 2.309,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot lists all the expected collaboration tools and mentions client preference, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a21",
+      "kind": "answerable",
+      "question": "Do you have a tool for converting Ether units?",
+      "answer": "Yes, we offer an Ethereum Unit Converter tool that allows you to convert between various denominations of Ether, including Wei, Gwei, and ETH. You can use it for free here: https://www.decryptedlabs.io/unit-converter.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/unit-converter"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.28,
+      "total_s": 1.961,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately describes the tool and provides the correct link, matching the expected answer and context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a22",
+      "kind": "answerable",
+      "question": "What is the factor for Gwei in your unit converter?",
+      "answer": "I don't have that specific information about the conversion factor for Gwei in our unit converter. However, you can use our Ethereum unit converter tool to perform conversions between Gwei, Wei, and ETH instantly. You can access it here: https://www.decryptedlabs.io/unit-converter.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/unit-converter"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.144,
+      "total_s": 1.837,
+      "verdict": "incorrect",
+      "hallucinated": false,
+      "reason": "The bot says it doesn't know the factor, but the expected answer is available and specific (9 for Gwei).",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a23",
+      "kind": "answerable",
+      "question": "Do you have an ABI encoder?",
+      "answer": "Yes, we offer a free online ABI encoder tool for Ethereum smart contracts. You can use it to encode and decode ABI data easily. You can access the tool here: https://www.decryptedlabs.io/abi-encoder.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/abi-encoder"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/abi-encoder",
+        "https://www.decryptedlabs.io/abi-encoder"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.286,
+      "total_s": 1.978,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states the existence of a free online ABI encoder for Ethereum smart contracts, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a24",
+      "kind": "answerable",
+      "question": "What are the steps after I reach out to you?",
+      "answer": "After you reach out to Decrypted Labs, the steps typically include:\n\n1. **Communication Setup**: They will set up communication and introduce your team.\n2. **Understanding Your Vision**: They will consult with you to understand your project goals and capture your requirements completely.\n3. **Proposal and Agreement**: A proposal will be shared, refined together, and finalized into an agreement.\n\nIf you have specific details about your project or inquiry, feel free to share, or you can contact the team directly for more information.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/contact-us",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/services/product-design"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/privacy-policy"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.203,
+      "total_s": 2.58,
+      "verdict": "partial",
+      "hallucinated": false,
+      "reason": "The bot includes consultation and proposal/agreement but omits onboarding and kickoff as a distinct step.",
+      "retrieval_hit": true,
+      "citation_hit": false
+    },
+    {
+      "id": "a25",
+      "kind": "answerable",
+      "question": "How quickly do you respond when I submit the contact form?",
+      "answer": "Decrypted Labs responds to inquiries submitted through the contact form in under 5 minutes. If you have any specific questions or need assistance, feel free to reach out!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/contact-us",
+        "https://www.decryptedlabs.io/privacy-policy"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.354,
+      "total_s": 1.824,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states the response time as under 5 minutes, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": false
+    },
+    {
+      "id": "a26",
+      "kind": "answerable",
+      "question": "Do you build iOS apps, and with what technology?",
+      "answer": "Yes, we build iOS apps that are engineered for reliability, performance, and a seamless experience across the Apple ecosystem. We use Swift, SwiftUI, and modern modular architectures to create apps that are fast, scalable, and easy to maintain. Whether you're launching an MVP or deploying enterprise-grade solutions, we can help. If you would like to learn more, you can visit our iOS app development page here: https://www.decryptedlabs.io/services/mobile-app-development.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/services/mobile-app-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/mobile-app-development",
+        "https://www.decryptedlabs.io/services/mobile-app-development",
+        "https://www.decryptedlabs.io/services/mobile-app-development",
+        "https://www.decryptedlabs.io/services/mobile-app-development",
+        "https://www.decryptedlabs.io/about-us"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.314,
+      "total_s": 2.535,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot confirms iOS app development and specifies Swift, SwiftUI, and modern modular architectures as technologies used, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a27",
+      "kind": "answerable",
+      "question": "What kinds of companies do you work with?",
+      "answer": "We work with a variety of companies, including:\n\n1. **Web3 Companies**: Building dApps, smart contracts, DeFi interfaces, tokenized products, multi-chain platforms, and blockchain user experiences.\n2. **Fintech Teams**: Developing payment products, dashboards, wallets, settlement flows, tokenized assets, and financial technology platforms.\n3. **AI Companies**: Creating product interfaces, automation tools, internal assistants, dashboards, workflow systems, and AI-powered software.\n4. **Enterprises**: Supporting secure, reliable, and scalable digital products, internal platforms, automation systems, or blockchain-enabled workflows.\n5. **Agencies and Product Teams**: Providing technical delivery support for complex AI, blockchain, or software projects.\n6. **Startups**: Helping them move from product idea, prototype, or early traction into scalable AI, blockchain, fintech, and software products.\n\nIf you have a specific type of company in mind or need more information, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/about-us"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.273,
+      "total_s": 3.488,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot lists all the expected company types and provides accurate supporting details from the context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a28",
+      "kind": "answerable",
+      "question": "Do you sell my personal data?",
+      "answer": "No, we do not sell your personal information. If you have any further questions about how we handle your data, feel free to ask.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/privacy-policy"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.403,
+      "total_s": 1.779,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot clearly states that personal information is not sold, matching the expected answer and context.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a29",
+      "kind": "answerable",
+      "question": "Where are files I upload through your contact form stored?",
+      "answer": "Files you upload through our contact form are securely stored using DigitalOcean Spaces. If you have any more questions or need assistance, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/privacy-policy"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/privacy-policy"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.308,
+      "total_s": 1.661,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot correctly states that files are stored using DigitalOcean Spaces, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "a30",
+      "kind": "answerable",
+      "question": "Have you built products on Solana?",
+      "answer": "The Context does not specify whether Decrypted Labs has built products on Solana. However, it does mention that they offer Solana development services, including building decentralized applications and smart contracts. If you would like more specific information, I can help you contact the team. Would you like to do that?",
+      "context_sources": [
+        "https://www.decryptedlabs.io/blockchains/hire-solana",
+        "https://www.decryptedlabs.io/blog/why-solana-is-the-blockchain-of-the-future-speed-scalability-and-security",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams",
+        "https://www.decryptedlabs.io/services/product-design"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/blockchains/hire-solana",
+        "https://www.decryptedlabs.io/blog/why-solana-is-the-blockchain-of-the-future-speed-scalability-and-security",
+        "https://www.decryptedlabs.io/services/product-design",
+        "https://www.decryptedlabs.io/blockchains/hire-solana",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.309,
+      "total_s": 2.257,
+      "verdict": "partial",
+      "hallucinated": false,
+      "reason": "The bot correctly states they offer Solana development but misses the explicit claim that they have built Solana products, and hedges unnecessarily.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "d01",
+      "kind": "decline",
+      "question": "How much does it cost to build an AI customer support agent with you?",
+      "answer": "I don't have specific pricing information for building an AI customer support agent. I recommend reaching out to our team to discuss your requirements and get a tailored quote. You can contact us through our website for more details.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.235,
+      "total_s": 1.695,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot correctly declined to provide a price and suggested contacting the team, as required.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "d02",
+      "kind": "decline",
+      "question": "What is your hourly rate for a Solidity developer?",
+      "answer": "I don't have specific information about hourly rates for Solidity developers. I recommend reaching out to the team directly for detailed pricing information or to discuss your requirements. Would you like assistance with that?",
+      "context_sources": [
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.392,
+      "total_s": 1.894,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot correctly declines to provide a rate and suggests contacting the team, as no rate is listed on the site.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "d03",
+      "kind": "decline",
+      "question": "Who is the CEO of Decrypted Labs?",
+      "answer": "I don't have that specific information about the CEO of Decrypted Labs. If you would like, I can help with other related inquiries or you can contact the team for more details.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/services/blockchain-development",
+        "https://www.decryptedlabs.io/services/custom-software-development",
+        "https://www.decryptedlabs.io/services/dapp-development",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams",
+        "https://www.decryptedlabs.io/services/enterprise-blockchain-solutions",
+        "https://www.decryptedlabs.io/services/mobile-app-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/services/mobile-app-development",
+        "https://www.decryptedlabs.io/services/blockchain-development",
+        "https://www.decryptedlabs.io/services/custom-software-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.212,
+      "total_s": 1.678,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot correctly declines to provide a CEO name, as none is listed on the site.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "d04",
+      "kind": "decline",
+      "question": "What is the current price of ETH?",
+      "answer": "I don't have that specific information about the current price of ETH. If you have any other questions or need assistance with something else, feel free to ask!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/blockchains/hire-ethereum",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/unit-converter"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/unit-converter",
+        "https://www.decryptedlabs.io/unit-converter"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.247,
+      "total_s": 1.98,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot correctly declined to provide a live ETH price, as required.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "d05",
+      "kind": "decline",
+      "question": "Can you guarantee my token gets listed on Binance?",
+      "answer": "I don't have that specific information about guaranteeing token listings on Binance. However, I can help you with tokenization and digital asset systems, or you can reach out to our team for more details on your requirements. Would you like to contact them?",
+      "context_sources": [
+        "https://www.decryptedlabs.io/blockchains/hire-binance-smart-chain",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/services/blockchain-development",
+        "https://www.decryptedlabs.io/services/custom-software-development"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/blockchains/hire-binance-smart-chain"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.305,
+      "total_s": 2.092,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot does not promise or guarantee a Binance listing and appropriately declines to provide such a guarantee.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "d06",
+      "kind": "decline",
+      "question": "Do you offer a free trial of your AI chatbot?",
+      "answer": "I don't have specific information about a free trial for our AI chatbot. If you're interested, I can pass your request to the team or you can contact them directly for more details. Would you like to do that?",
+      "context_sources": [
+        "https://www.decryptedlabs.io/contact-us",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/custom-software-development",
+        "https://www.decryptedlabs.io/services/generative-ai-development",
+        "https://www.decryptedlabs.io/services/product-design"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/generative-ai-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.283,
+      "total_s": 1.89,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot does not claim a free trial exists and offers to connect the user with the team, which matches the expected answer.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "t01",
+      "kind": "trap",
+      "question": "Do you offer SEO and digital marketing services?",
+      "answer": "We do not offer SEO and digital marketing services. If you're looking for assistance with those areas, I can pass your request to the team or help you with any related inquiries about our services. What are you trying to achieve?",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/custom-software-development",
+        "https://www.decryptedlabs.io/services/generative-ai-development",
+        "https://www.decryptedlabs.io/services/mobile-app-development",
+        "https://www.decryptedlabs.io/services/smart-contract-auditing"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/services/ai-agent-development"
+      ],
+      "rewrites": 0,
+      "ttft_s": 1.293,
+      "total_s": 1.959,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot clearly states that SEO and digital marketing services are not offered, matching the expected answer.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "t02",
+      "kind": "trap",
+      "question": "Do you do video production or animation?",
+      "answer": "We don't offer video production or animation services. If you're looking for assistance with design or development, I can help with that. Would you like me to pass your request to the team or ask what you're trying to achieve?",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/blockchains/hire-avalanche",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/developers/hire-next-js-developers",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams",
+        "https://www.decryptedlabs.io/services/generative-ai-development",
+        "https://www.decryptedlabs.io/services/product-design"
+      ],
+      "cited_sources": [],
+      "rewrites": 0,
+      "ttft_s": 1.376,
+      "total_s": 1.92,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot clearly states that video production or animation services are not offered and does not pitch unrelated services as a match.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "t03",
+      "kind": "trap",
+      "question": "Can you handle our company's accounting and tax filing?",
+      "answer": "I'm sorry, but we don't offer accounting or tax filing services. However, I can help you with information about our AI agent development services or other offerings. If you have specific needs, I can pass your request to our team. Let me know how you would like to proceed!",
+      "context_sources": [
+        "https://www.decryptedlabs.io/about-us",
+        "https://www.decryptedlabs.io/blockchains/hire-avalanche",
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/custom-software-development",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams"
+      ],
+      "cited_sources": [],
+      "rewrites": 0,
+      "ttft_s": 1.72,
+      "total_s": 2.464,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot clearly states that accounting and tax filing services are not offered, matching the expected answer.",
+      "retrieval_hit": null,
+      "citation_hit": null
+    },
+    {
+      "id": "f01",
+      "kind": "follow_up",
+      "question": "How long did it take?",
+      "answer": "The Penthian project took nine months to deliver a production-ready platform.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/blockchains/hire-polygon",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/services/dedicated-development-teams"
+      ],
+      "cited_sources": [
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace",
+        "https://www.decryptedlabs.io/developers/hire-solidity-developer",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace"
+      ],
+      "rewrites": 1,
+      "ttft_s": 2.885,
+      "total_s": 3.161,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot accurately states the project took nine months to production, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": true
+    },
+    {
+      "id": "f02",
+      "kind": "follow_up",
+      "question": "Can they book appointments?",
+      "answer": "Yes, our AI agents can assist with appointment support, including booking appointments. If you would like to learn more about our services or discuss your specific needs, feel free to reach out to our team.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/developers/hire-smart-contract-auditors",
+        "https://www.decryptedlabs.io/privacy-policy",
+        "https://www.decryptedlabs.io/services/ai-agent-development",
+        "https://www.decryptedlabs.io/services/ai-development",
+        "https://www.decryptedlabs.io/services/mobile-app-development"
+      ],
+      "cited_sources": [],
+      "rewrites": 0,
+      "ttft_s": 1.276,
+      "total_s": 1.797,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot correctly states that appointment support, including booking, is available, matching the expected answer.",
+      "retrieval_hit": true,
+      "citation_hit": false
+    },
+    {
+      "id": "f03",
+      "kind": "follow_up",
+      "question": "What's the minimum to invest?",
+      "answer": "The minimum investment to participate in NFStay is $1,000.",
+      "context_sources": [
+        "https://www.decryptedlabs.io/case-studies/degen-forest-bank-grade-multi-chain-wallet",
+        "https://www.decryptedlabs.io/case-studies/earnm-scaling-design-at-the-speed-of-a-40m-startup",
+        "https://www.decryptedlabs.io/case-studies/nfstay-tokenizing-the-rental-market-with-blockchain",
+        "https://www.decryptedlabs.io/case-studies/penthian-building-australias-regulated-virtual-asset-marketplace"
+      ],
+      "cited_sources": [],
+      "rewrites": 0,
+      "ttft_s": 1.376,
+      "total_s": 1.57,
+      "verdict": "correct",
+      "hallucinated": false,
+      "reason": "The bot correctly states the minimum investment is $1,000, matching the expected answer and context.",
+      "retrieval_hit": true,
+      "citation_hit": false
+    }
+  ]
+}
