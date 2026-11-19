@@ -127,6 +127,48 @@ def _sections(body) -> list[Chunk]:
     return sections
 
 
+# "12+", "$3M+", "70%+", "2,000+", "4.8/5": the number half of a stat counter.
+_STAT_NUMBER = re.compile(r"^[$€£]?\s?\d[\d.,]*\s?[kmb]?%?\+?(/\d+)?$", re.I)
+_NON_TEXT = {"svg", "img", "picture", "script", "style", "noscript"}
+MAX_STAT_LABEL_CHARS = 60
+MAX_DEFINITION_CHARS = 200
+
+
+def _fact(a: str, b: str) -> str:
+    return f"{a} {b}" if _STAT_NUMBER.match(a) else f"{a}: {b}"
+
+
+def _key_facts(body) -> list[str]:
+    """Stat counters ("12+" / "Countries Served") and <dl> term/value pairs.
+
+    _sections never sees these: each half is under MIN_BLOCK_CHARS or sits in a
+    <span>/<dt>/<dd> it doesn't walk, so "how many countries / which region /
+    how many properties" got "I don't have that information" on a site that
+    states it (eval run 2026-11-19: 8 of 11 misses). Pairs are grouped by their
+    container into one chunk, so a stat strip repeated on every page has
+    identical content and clean_chunks stores it once."""
+    groups: dict[int, list[str]] = {}
+    for el in body.find_all(True):
+        if el.name == "dl":  # plain <dl><dt/><dd/>…</dl>, no wrapper divs
+            kids = [c for c in el.find_all(recursive=False) if c.name in ("dt", "dd")]
+            for dt, dd in zip(kids[::2], kids[1::2], strict=False):
+                a, b = collapse_ws(dt.get_text(" ")), collapse_ws(dd.get_text(" "))
+                if dt.name == "dt" and dd.name == "dd" and a and b and len(b) <= MAX_DEFINITION_CHARS:
+                    groups.setdefault(id(el), []).append(_fact(a, b))
+            continue
+        kids = [c for c in el.find_all(recursive=False) if c.name not in _NON_TEXT]
+        if len(kids) != 2:
+            continue
+        a, b = (collapse_ws(k.get_text(" ")) for k in kids)
+        if not (a and b):
+            continue
+        is_definition = {k.name for k in kids} == {"dt", "dd"} and len(a + b) <= MAX_DEFINITION_CHARS
+        is_stat = _STAT_NUMBER.match(a) and len(b) <= MAX_STAT_LABEL_CHARS
+        if is_definition or is_stat:
+            groups.setdefault(id(el.parent), []).append(_fact(a, b))
+    return ["Key facts: " + "; ".join(items) for items in groups.values()]
+
+
 def parse_html(html: str) -> ParsedPage:
     soup = BeautifulSoup(html, "lxml")
     title = collapse_ws(soup.title.get_text()) if soup.title else ""
@@ -146,7 +188,16 @@ def parse_html(html: str) -> ParsedPage:
         chunks = [Chunk(piece, s.section_type, s.heading_path) for s in sections for piece in split_text(s.content)]
     else:
         chunks = [Chunk(piece, "body", "") for piece in split_text(text)]
-    return ParsedPage(title=title or "Untitled", text=text, description=description, lang=lang, chunks=chunks)
+    title = title or "Untitled"
+    # "[Title]" puts the page's subject into the embedding ("Key facts: $3M+ raised" alone never
+    # matched "How much did Degen Forest raise?"), while normalize_for_dedup strips bracketed
+    # labels, so a stat strip shown on every page still hashes the same and is stored once.
+    label = f"[{title}]\n"
+    chunks += [Chunk(label + fact, "facts", title) for fact in _key_facts(body)]
+    # Sites often state a fact only in the meta description ("We respond in under 5 minutes").
+    if len(description) >= MIN_BLOCK_CHARS:
+        chunks.append(Chunk(label + collapse_ws(description), "description", title))
+    return ParsedPage(title=title, text=text, description=description, lang=lang, chunks=chunks)
 
 
 def clean_chunks(chunks: list[Chunk], seen_hashes: set[str]) -> list[Chunk]:
